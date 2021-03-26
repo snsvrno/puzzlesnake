@@ -22,17 +22,19 @@ class Game extends hxd.App {
 	public var grid : Array<Array<Tile>>;
 	private var foods : Array<Food> = [];
 	private var tails : Array<Tail> = [];
+	private var walls : Array<Tail> = [];
 
 	// layers
 	private var playerLayer : h2d.Object;
 	private var tileLayer : h2d.Object;
+	private var wallsLayer : h2d.Object;
 	private var foodLayer : h2d.Object;
 
 	// trackers and variables
 	private var tickGraphic : h2d.Graphics;
 	/*** how many foods should exist. */
 	private var foodLimit : Int = 3;
-	private var newTailGen : Int = 0;
+	private var tailQueue : Array<Food> = [];
 	private var player : Player;
 
 	////////////////////////////////////////////////////////////////////
@@ -54,6 +56,7 @@ class Game extends hxd.App {
 		tickGraphic = new h2d.Graphics(s2d);
 
 		foodLayer = new h2d.Object(s2d);
+		wallsLayer = new h2d.Object(s2d);
 		playerLayer = new h2d.Object(s2d);
 		tileLayer = new h2d.Object(s2d);
 
@@ -85,9 +88,12 @@ class Game extends hxd.App {
 		tickTimer = 0;
 		while (foods.length > 0) foods.pop().remove();
 		while (tails.length > 0) tails.pop().remove();
+		while (tailQueue.length > 0) tailQueue.pop();
+		while (walls.length > 0) walls.pop().remove();
 
 		// setup the new stuff.
-		player.setGridPositionRandom(1);
+		player.setGridPositionRandom(2);
+		player.setRandomDirection();
 
 		makeFood();
 	}
@@ -109,6 +115,7 @@ class Game extends hxd.App {
 			// if the player returns false then it is dead.
 			if (!player.tick()) gameOver();
 			if (player.collides(tails)) gameOver();
+			if (player.collides(walls)) gameOver();
 
 			// updates the tail positions
 			for (i in 0 ... tails.length) {
@@ -120,21 +127,37 @@ class Game extends hxd.App {
 				lastx = tx;
 				lasty = ty;
 			}
-
 			// checks if he should grow.
-			var grew = false;
-			if (newTailGen > 0) {
-				newTailGen -= 1;
-				var tail = new Tail(playerLayer);
-				tail.setGridPosition(lastx, lasty);
-				tails.push(tail);
-				grew = true;
-			}
+			if (tailQueue.length > 0) {
+				var food = tailQueue.shift();
+				player.setHeadColor(food.getColor());
 
-			// sets the colors for all the tails only if we grow.
-			if (grew && tails.length > 0) {
-				var gradient = player.getGradient(tails.length);
-				for (i in 0 ... tails.length) tails[i].setFillColor(gradient[i]);
+				var tail = new Tail(food, playerLayer);
+				tail.setGridPosition(lastx, lasty);
+
+				// checks if we have 3 of a kind, if we should break the segments
+				if (tails.length >= 2 && tails[tails.length-1].variant == tails[tails.length-2].variant && tails[tails.length-1].variant == food.variant) {
+
+					// we got a match!
+					var segment = tails.pop();
+					//segment.remove();
+					wallsLayer.addChild(segment);
+					walls.push(segment);
+
+					var segment2 = tails.pop();
+					//segment2.remove();
+					wallsLayer.addChild(segment2);
+					walls.push(segment2);
+
+					//tail.remove();
+					wallsLayer.addChild(tail);
+					walls.push(tail);
+
+				} else {
+
+					tails.push(tail);
+
+				}
 			}
 
 			// checks if he ate any food.
@@ -142,7 +165,7 @@ class Game extends hxd.App {
 				if (f.gx == player.gx && f.gy == player.gy) {
 					foods.remove(f);
 					f.remove();
-					newTailGen += 1;
+					tailQueue.push(f);
 				}
 			}
 

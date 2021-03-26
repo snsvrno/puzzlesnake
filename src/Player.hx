@@ -16,14 +16,7 @@ class Player extends GridObject {
 		fillColor = Utils.RGBToHex(0,0,255);
 		lastColor = Utils.RGBToHex(0,0,150);
 
-		// sets a random direction
-		switch(Math.floor(Math.random()*4)) {
-			case 0: direction = Up;
-			case 1: direction = Left;
-			case 2: direction = Down;
-			case 3: direction = Right;
-			case _:	// not reachable ...
-		}
+		setRandomDirection();
 
 		updateGraphics();
 	}
@@ -69,6 +62,24 @@ class Player extends GridObject {
 		updateGraphics();
 
 		return setGridPosition(ngx, ngy);
+	}
+
+	public function setHeadColor(color : Int) {
+		fillColor = color;
+		updateGraphics();
+	}
+
+	public function setRandomDirection() {
+		// sets a random direction
+		switch(Math.floor(Math.random()*4)) {
+			case 0: direction = Up;
+			case 1: direction = Left;
+			case 2: direction = Down;
+			case 3: direction = Right;
+			case _:	// not reachable ...
+		}
+
+		updateGraphics();
 	}
 
 	public function keypressed(keycode : Int) {
