@@ -1,0 +1,10 @@
+# workspace stuff
+.vscode
+*.code-workspace
+build.hxml
+
+# compiled stuffs
+bin
+
+# haxelib stuff
+.haxelib
