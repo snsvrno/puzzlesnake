@@ -2,6 +2,7 @@ enum Direction { Up; Down; Left; Right; }
 
 class Player extends GridObject {
 	private var direction : Direction;
+	private var movingDirection : Direction;
 
 	private var eyeSize : Int = 2;
 	private var eyePadding : Int = 2;
@@ -51,7 +52,8 @@ class Player extends GridObject {
 		
 		var ngx : Int = gx;
 		var ngy : Int = gy;
-
+		
+		movingDirection = direction;
 		switch(direction) {
 			case Up: ngy -= 1;
 			case Down: ngy += 1;
@@ -85,10 +87,10 @@ class Player extends GridObject {
 	public function keypressed(keycode : Int) {
 		
 		switch(keycode) {
-			case hxd.Key.W: if (direction == Left || direction == Right) direction = Up;
-			case hxd.Key.D: if (direction == Up || direction == Down) direction = Right;
-			case hxd.Key.S: if (direction == Left || direction == Right) direction = Down;
-			case hxd.Key.A: if (direction == Up || direction == Down) direction = Left;
+			case hxd.Key.W: if (movingDirection == Left || direction == Right) direction = Up;
+			case hxd.Key.D: if (movingDirection == Up || direction == Down) direction = Right;
+			case hxd.Key.S: if (movingDirection == Left || direction == Right) direction = Down;
+			case hxd.Key.A: if (movingDirection == Up || direction == Down) direction = Left;
 			case _:
 		}
 	}

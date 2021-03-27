@@ -8,6 +8,12 @@ class Tail extends GridObject {
 		variant = food.variant;
 		fillColor = food.fillColor;
 		updateGraphics();
+	}
 
+	public function setWall() {
+		outlineColor = fillColor;
+		fillColor = 0x222222;
+		outlineSize = 4;
+		updateGraphics();
 	}
 }

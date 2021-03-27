@@ -19,6 +19,7 @@ class Game extends hxd.App {
 	private var tileLayer : h2d.Object;
 	private var wallsLayer : h2d.Object;
 	private var foodLayer : h2d.Object;
+	private var uiLayer : h2d.Object;
 
 	// trackers and variables
 	private var tickGraphic : h2d.Graphics;
@@ -26,6 +27,11 @@ class Game extends hxd.App {
 	private var foodLimit : Int = 3;
 	private var tailQueue : Array<Food> = [];
 	private var player : Player;
+
+	// the ui stuff
+	private var valueTrackers : Map<Int, FoodValue> = new Map();
+	private var score : Score;
+
 
 	////////////////////////////////////////////////////////////////////
 
@@ -45,6 +51,8 @@ class Game extends hxd.App {
 
 		tickGraphic = new h2d.Graphics(s2d);
 
+		uiLayer = new h2d.Object(s2d);
+		uiLayer.y = - Settings.UIHEIGHT;
 		foodLayer = new h2d.Object(s2d);
 		wallsLayer = new h2d.Object(s2d);
 		playerLayer = new h2d.Object(s2d);
@@ -67,8 +75,27 @@ class Game extends hxd.App {
 		}
 
 		player = new Player(playerLayer);
-		start();
+		// setup the UI elements
+		// UI BACKGROUND FOR TESTING.
+		var graphics = new h2d.Graphics(uiLayer);
+		graphics.lineStyle(1,0x222222);
+		graphics.beginFill(0x222222);
+		graphics.drawRect(0,0,width * Tile.SIZE, Settings.UIHEIGHT);
+		graphics.endFill();
+		// the food scores
+		for (v in 0 ... Food.variants.length) {
+			var one = new FoodValue(v, uiLayer);
+			one.x = 10 + v * 40;
+			one.y = Settings.UIHEIGHT/2;
+			valueTrackers.set(v, one);
+		}
+		// the actual point score.
+		score = new Score(uiLayer);
+		score.x = width * Tile.SIZE - 3;
+		score.y = Settings.UIHEIGHT/2;
 
+
+		start();
 		onResize();
 	}
 
@@ -85,6 +112,8 @@ class Game extends hxd.App {
 				grid[i][j].clearBlocking();
 			}
 		}
+		for (v => tracker in valueTrackers) tracker.reset();
+		score.value = 0;
 
 		// setup the new stuff.
 		player.setGridPositionRandom(2);
@@ -126,10 +155,11 @@ class Game extends hxd.App {
 			// checks if he should grow.
 			if (tailQueue.length > 0) {
 				var food = tailQueue.shift();
-				player.setHeadColor(food.getColor());
 
 				var tail = new Tail(food, playerLayer);
 				tail.setGridPosition(lastx, lasty);
+
+				score.value += valueTrackers.get(tail.variant).value;
 
 				// checks if we have 3 of a kind, if we should break the segments
 				if (tails.length >= 2 && tails[tails.length-1].variant == tails[tails.length-2].variant && tails[tails.length-1].variant == food.variant) {
@@ -137,25 +167,34 @@ class Game extends hxd.App {
 					// we got a match!
 					var segment = tails.pop();
 					//segment.remove();
+					segment.setWall();
 					wallsLayer.addChild(segment);
 					walls.push(segment);
 
 					var segment2 = tails.pop();
 					//segment2.remove();
+					segment2.setWall();
 					wallsLayer.addChild(segment2);
 					walls.push(segment2);
 
 					//tail.remove();
+					tail.setWall();
 					wallsLayer.addChild(tail);
 					walls.push(tail);
 
 					updateEdgeGrid();
+					
+					// increase the multiplier.
+					valueTrackers.get(tail.variant).increase();
 
 				} else {
 
 					tails.push(tail);
 
 				}
+
+				// update your color to the tail color
+				if (tails.length > 0) player.setHeadColor(tails[tails.length-1].getColor());
 			}
 
 			// checks if he ate any food.
@@ -182,12 +221,12 @@ class Game extends hxd.App {
 		var height = Tile.SIZE * this.height;
 
 		var scalex = window.width / (width +  2 * Settings.ZOOMPADDING);
-		var scaley = window.height / (height +  2 * Settings.ZOOMPADDING);
+		var scaley = window.height / (Settings.UIHEIGHT + height +  3 * Settings.ZOOMPADDING);
 
 		s2d.setScale(Math.min(scalex, scaley));
 
 		s2d.x = (window.width - width * s2d.scaleX)/2;
-		s2d.y = (window.height - height * s2d.scaleY)/2;
+		s2d.y = Settings.UIHEIGHT * s2d.scaleY + (window.height - (height + Settings.UIHEIGHT) * s2d.scaleY)/2;
 	}
 
 	function onEvent(e : hxd.Event) {
