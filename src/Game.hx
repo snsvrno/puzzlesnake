@@ -2,16 +2,6 @@ class Game extends hxd.App {
 
 	////////////////////////////////////////////////////////////////////
 
-	inline static private var GRIDWIDTH : Int = 10;
-	inline static private var GRIDHEIGHT : Int = 10;
-	inline static private var ZOOMPADDING : Int = 10;
-	inline static private var TICKLENGTH : Float = 0.3;
-
-	inline static private var TICKGCOLOR : Int = 0xFF0000;
-	inline static private var TICKGOPACITY : Float = 0.3;
-
-	////////////////////////////////////////////////////////////////////
-
 	static public var instance : Game;
 
 	////////////////////////////////////////////////////////////////////
@@ -60,8 +50,8 @@ class Game extends hxd.App {
 		playerLayer = new h2d.Object(s2d);
 		tileLayer = new h2d.Object(s2d);
 
-		width = GRIDWIDTH;
-		height = GRIDHEIGHT;
+		width = Settings.GRIDWIDTH;
+		height = Settings.GRIDHEIGHT;
 		
 		// initalizes the grid
 		grid = [];
@@ -90,6 +80,11 @@ class Game extends hxd.App {
 		while (tails.length > 0) tails.pop().remove();
 		while (tailQueue.length > 0) tailQueue.pop();
 		while (walls.length > 0) walls.pop().remove();
+		for (i in 0 ... width) {
+			for (j in 0 ... height) {
+				grid[i][j].clearBlocking();
+			}
+		}
 
 		// setup the new stuff.
 		player.setGridPositionRandom(2);
@@ -106,7 +101,7 @@ class Game extends hxd.App {
 		super.update(dt);
 
 		tickTimer += dt;
-		if (tickTimer > TICKLENGTH) {
+		if (tickTimer > Settings.TICKLENGTH) {
 			tickTimer = 0;
 
 			var lastx = player.gx;
@@ -127,6 +122,7 @@ class Game extends hxd.App {
 				lastx = tx;
 				lasty = ty;
 			}
+
 			// checks if he should grow.
 			if (tailQueue.length > 0) {
 				var food = tailQueue.shift();
@@ -152,6 +148,8 @@ class Game extends hxd.App {
 					//tail.remove();
 					wallsLayer.addChild(tail);
 					walls.push(tail);
+
+					updateEdgeGrid();
 
 				} else {
 
@@ -180,11 +178,11 @@ class Game extends hxd.App {
 
 		var window = hxd.Window.getInstance();
 
-		var width = Tile.SIZE * GRIDWIDTH;
-		var height = Tile.SIZE * GRIDHEIGHT;
+		var width = Tile.SIZE * this.width;
+		var height = Tile.SIZE * this.height;
 
-		var scalex = window.width / (width +  2 * ZOOMPADDING);
-		var scaley = window.height / (height +  2 * ZOOMPADDING);
+		var scalex = window.width / (width +  2 * Settings.ZOOMPADDING);
+		var scaley = window.height / (height +  2 * Settings.ZOOMPADDING);
 
 		s2d.setScale(Math.min(scalex, scaley));
 
@@ -204,9 +202,30 @@ class Game extends hxd.App {
 		while (foods.length < foodLimit) {
 			var f = new Food(foodLayer);
 
-			f.setGridPositionRandom([[player], cast(foods, Array<Dynamic>), tails]);
+			f.setGridPositionRandom([[player], cast(foods, Array<Dynamic>), tails, walls]);
 
 			foods.push(f);
+		}
+	}
+
+	/**
+	 * Goes through all the edge pieces and changes the line colors if there
+	 * is a wall on the opposite side, so you can tell that you can't go there
+	 * without looking across to the other side.
+	 */
+	private function updateEdgeGrid() {
+		for (w in walls) {
+			
+			// is an edge piece.
+			if (w.gx == 0 || w.gy == 0 || w.gx == width-1 || w.gy == height-1) {
+				
+				if (w.gx == 0) grid[width-1][w.gy].setBlocking(Right, w.getColor());
+				else if (w.gx == width-1) grid[0][w.gy].setBlocking(Left, w.getColor());
+
+				if (w.gy == 0) grid[w.gx][height-1].setBlocking(Down, w.getColor());
+				else if (w.gy == height-1) grid[w.gx][0].setBlocking(Up, w.getColor());
+			}
+
 		}
 	}
 }

@@ -37,8 +37,23 @@ class GridObject extends h2d.Graphics {
 		gx = newGx;
 		gy = newGy;
 
-		// check if have grid points that are outside the board.
-		if (gx < 0 || gx >= Game.instance.width || gy < 0 || gy >= Game.instance.height) return false;
+		if (Settings.WORLDWRAP) {
+
+			// check if we need to wrap.
+			if (gx < 0) gx += Game.instance.width;
+			else if (gx >= Game.instance.width) gx -= Game.instance.width;
+
+			if (gy < 0) gy += Game.instance.height;
+			else if (gy >= Game.instance.height) gy -= Game.instance.height;
+
+		} else {
+
+			// if we don't world wrap then when we go to the edge of the world
+			// its game over.
+
+			// check if have grid points that are outside the board.
+			if (gx < 0 || gx >= Game.instance.width || gy < 0 || gy >= Game.instance.height) return false;
+		}
 
 		var tile = Game.instance.grid[gx][gy];
 		
