@@ -8,6 +8,8 @@ class Game extends hxd.App {
 
 	private var tickTimer : Float = 0;
 
+	private var world : h2d.Object;
+
 	// organizational objects
 	public var grid : Array<Array<Tile>>;
 	private var foods : Array<Food> = [];
@@ -53,16 +55,18 @@ class Game extends hxd.App {
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
 
-		blankSpace = new h2d.Graphics(s2d);
+		world = new h2d.Object(s2d);
 
-		tickGraphic = new h2d.Graphics(s2d);
+		blankSpace = new h2d.Graphics(world);
 
-		uiLayer = new h2d.Object(s2d);
+		tickGraphic = new h2d.Graphics(world);
+
+		uiLayer = new h2d.Object(world);
 		uiLayer.y = - Settings.UIHEIGHT;
-		foodLayer = new h2d.Object(s2d);
-		wallsLayer = new h2d.Object(s2d);
-		playerLayer = new h2d.Object(s2d);
-		tileLayer = new h2d.Object(s2d);
+		foodLayer = new h2d.Object(world);
+		wallsLayer = new h2d.Object(world);
+		playerLayer = new h2d.Object(world);
+		tileLayer = new h2d.Object(world);
 
 		width = Settings.GRIDWIDTH;
 		height = Settings.GRIDHEIGHT;
@@ -104,7 +108,7 @@ class Game extends hxd.App {
 		var filtergroup = new h2d.filter.Group();
 		crt = new shaders.CRT();
 		bubble = new shaders.Bubble();
-		// filtergroup.add(new h2d.filter.Shader(crt));
+		filtergroup.add(new h2d.filter.Shader(crt));
 		filtergroup.add(new h2d.filter.Shader(bubble));
 		s2d.filter = filtergroup;
 
@@ -236,14 +240,14 @@ class Game extends hxd.App {
 		var scalex = window.width / (width +  2 * Settings.ZOOMPADDING);
 		var scaley = window.height / (Settings.UIHEIGHT + height +  3 * Settings.ZOOMPADDING);
 
-		s2d.setScale(Math.min(scalex, scaley));
+		world.setScale(Math.min(scalex, scaley));
 
-		s2d.x = (window.width - width * s2d.scaleX)/2;
-		s2d.y = Settings.UIHEIGHT * s2d.scaleY + (window.height - (height + Settings.UIHEIGHT) * s2d.scaleY)/2;
+		world.x = (window.width - width * world.scaleX)/2;
+		world.y = Settings.UIHEIGHT * world.scaleY + (window.height - (height + Settings.UIHEIGHT) * world.scaleY)/2;
 
 		blankSpace.clear();
 		blankSpace.beginFill(Settings.BGCOLOR);
-		blankSpace.drawRect(-s2d.x / s2d.scaleX,-s2d.y / s2d.scaleY, window.width / s2d.scaleX, window.height / s2d.scaleY);
+		blankSpace.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		blankSpace.endFill();
 
 		bubble.backgroundColor.setColor(Settings.BGCOLOR);
