@@ -31,7 +31,11 @@ class Game extends hxd.App {
 	// the ui stuff
 	private var valueTrackers : Map<Int, FoodValue> = new Map();
 	private var score : Score;
+	private var blankSpace : h2d.Graphics;
 
+	// shaders
+	private var bubble : shaders.Bubble;
+	private var crt : shaders.CRT;
 
 	////////////////////////////////////////////////////////////////////
 
@@ -48,6 +52,8 @@ class Game extends hxd.App {
 	override function init() {
 
 		hxd.Window.getInstance().addEventTarget(onEvent);
+
+		blankSpace = new h2d.Graphics(s2d);
 
 		tickGraphic = new h2d.Graphics(s2d);
 
@@ -94,6 +100,13 @@ class Game extends hxd.App {
 		score.x = width * Tile.SIZE - 3;
 		score.y = Settings.UIHEIGHT/2;
 
+		// makes the shaders
+		var filtergroup = new h2d.filter.Group();
+		crt = new shaders.CRT();
+		bubble = new shaders.Bubble();
+		// filtergroup.add(new h2d.filter.Shader(crt));
+		filtergroup.add(new h2d.filter.Shader(bubble));
+		s2d.filter = filtergroup;
 
 		start();
 		onResize();
@@ -227,6 +240,19 @@ class Game extends hxd.App {
 
 		s2d.x = (window.width - width * s2d.scaleX)/2;
 		s2d.y = Settings.UIHEIGHT * s2d.scaleY + (window.height - (height + Settings.UIHEIGHT) * s2d.scaleY)/2;
+
+		blankSpace.clear();
+		blankSpace.beginFill(Settings.BGCOLOR);
+		blankSpace.drawRect(-s2d.x / s2d.scaleX,-s2d.y / s2d.scaleY, window.width / s2d.scaleX, window.height / s2d.scaleY);
+		blankSpace.endFill();
+
+		bubble.backgroundColor.setColor(Settings.BGCOLOR);
+
+		// need to update the crt shader so we know the 
+		// pixel size
+		crt.screenHeight = window.height;
+		crt.screenWidth = window.width;
+
 	}
 
 	function onEvent(e : hxd.Event) {
