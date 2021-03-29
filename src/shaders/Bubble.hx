@@ -5,7 +5,7 @@ class Bubble extends h3d.shader.ScreenShader {
         @param var texture : Sampler2D;
 
 		@param var backgroundColor : Vec4 = vec4(0,0,0,1);
-		@param var curvature : Vec2 = vec2(4,4);
+		@param var curvature : Vec2 = vec2(6,6);
 		
         function fragment() {
 			

@@ -1,4 +1,4 @@
-
+package obj;
 
 class Food extends GridObject {
 

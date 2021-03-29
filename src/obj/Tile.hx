@@ -1,3 +1,5 @@
+package obj;
+
 class Tile extends h2d.Graphics {
 
 	inline static private var COLOR : Int = 0x222222;

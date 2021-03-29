@@ -12,4 +12,6 @@ class Settings {
 
 	inline static public var UIHEIGHT : Int = 20;
 
+	inline static public var MENUITEMOVERCOLOR : Int = 0x666666;
+
 }

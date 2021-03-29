@@ -1,3 +1,5 @@
+package obj;
+
 enum Direction { Up; Down; Left; Right; }
 
 class Player extends GridObject {
@@ -86,13 +88,11 @@ class Player extends GridObject {
 
 	public function keypressed(keycode : Int) {
 		
-		switch(keycode) {
-			case hxd.Key.W: if (movingDirection == Left || direction == Right) direction = Up;
-			case hxd.Key.D: if (movingDirection == Up || direction == Down) direction = Right;
-			case hxd.Key.S: if (movingDirection == Left || direction == Right) direction = Down;
-			case hxd.Key.A: if (movingDirection == Up || direction == Down) direction = Left;
-			case _:
-		}
+		if (Controls.is("up", keycode)) if (movingDirection == Left || direction == Right) direction = Up;
+		if (Controls.is("down", keycode)) if (movingDirection == Left || direction == Right) direction = Down;
+		if (Controls.is("left", keycode)) if (movingDirection == Up || direction == Down) direction = Left;
+		if (Controls.is("right", keycode)) if (movingDirection == Up || direction == Down) direction = Right;
+
 	}
 
 	public function getGradient(count : Int) : Array<Int> {

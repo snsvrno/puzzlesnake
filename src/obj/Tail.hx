@@ -1,3 +1,5 @@
+package obj;
+
 class Tail extends GridObject {
 
 	public final variant : Int;

@@ -7,7 +7,7 @@ class CRT extends h3d.shader.ScreenShader {
 		@param var screenWidth : Int;
 		@param var screenHeight : Int;
 		@param var strength : Float = 0.2;
-		@param var scanStrength : Float = 0.4;
+		@param var scanStrength : Float = 0.6;
 		
         function fragment() {
 			pixelColor = texture.get(input.uv);

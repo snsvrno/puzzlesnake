@@ -1,3 +1,5 @@
+package ui;
+
 class Score extends h2d.Object {
 	
 	public var value(default, set) : Int = 0;

@@ -11,10 +11,10 @@ class Game extends hxd.App {
 	private var world : h2d.Object;
 
 	// organizational objects
-	public var grid : Array<Array<Tile>>;
-	private var foods : Array<Food> = [];
-	private var tails : Array<Tail> = [];
-	private var walls : Array<Tail> = [];
+	public var grid : Array<Array<obj.Tile>>;
+	private var foods : Array<obj.Food> = [];
+	private var tails : Array<obj.Tail> = [];
+	private var walls : Array<obj.Tail> = [];
 
 	// layers
 	private var playerLayer : h2d.Object;
@@ -27,17 +27,21 @@ class Game extends hxd.App {
 	private var tickGraphic : h2d.Graphics;
 	/*** how many foods should exist. */
 	private var foodLimit : Int = 3;
-	private var tailQueue : Array<Food> = [];
-	private var player : Player;
+	private var tailQueue : Array<obj.Food> = [];
+	private var player : obj.Player;
 
 	// the ui stuff
-	private var valueTrackers : Map<Int, FoodValue> = new Map();
-	private var score : Score;
+	private var valueTrackers : Map<Int, ui.FoodValue> = new Map();
+	private var score : ui.Score;
 	private var blankSpace : h2d.Graphics;
+	private var menu : ui.Menu;
 
 	// shaders
 	private var bubble : shaders.Bubble;
+	private var bubbleFilter : h2d.filter.Shader<shaders.Bubble>;
 	private var crt : shaders.CRT;
+	private var crtFilter : h2d.filter.Shader<shaders.CRT>;
+	private var filtergroup : h2d.filter.Group;
 
 	////////////////////////////////////////////////////////////////////
 
@@ -61,8 +65,6 @@ class Game extends hxd.App {
 
 		tickGraphic = new h2d.Graphics(world);
 
-		uiLayer = new h2d.Object(world);
-		uiLayer.y = - Settings.UIHEIGHT;
 		foodLayer = new h2d.Object(world);
 		wallsLayer = new h2d.Object(world);
 		playerLayer = new h2d.Object(world);
@@ -74,46 +76,62 @@ class Game extends hxd.App {
 		// initalizes the grid
 		grid = [];
 		for (i in 0 ... width) {
-			var column = new Array<Tile>();
+			var column = new Array<obj.Tile>();
 			for (j in 0 ... height) {
-				var tile = new Tile(tileLayer);
-				tile.x = i * Tile.SIZE + Tile.SIZE/2;
-				tile.y = j * Tile.SIZE + Tile.SIZE/2;
+				var tile = new obj.Tile(tileLayer);
+				tile.x = i * obj.Tile.SIZE + obj.Tile.SIZE/2;
+				tile.y = j * obj.Tile.SIZE + obj.Tile.SIZE/2;
 				column.push(tile);
 			}
 			grid.push(column);
 		}
 
-		player = new Player(playerLayer);
+		player = new obj.Player(playerLayer);
+
+		initUI();
+
+		start();
+		onResize();
+	}
+
+	private function initUI() {
+
 		// setup the UI elements
-		// UI BACKGROUND FOR TESTING.
+		uiLayer = new h2d.Object(world);
+		uiLayer.y = - Settings.UIHEIGHT;
+		
+		// the ui background bar.
 		var graphics = new h2d.Graphics(uiLayer);
 		graphics.lineStyle(1,0x222222);
 		graphics.beginFill(0x222222);
-		graphics.drawRect(0,0,width * Tile.SIZE, Settings.UIHEIGHT);
+		graphics.drawRect(0,0,width * obj.Tile.SIZE, Settings.UIHEIGHT);
 		graphics.endFill();
+		
 		// the food scores
-		for (v in 0 ... Food.variants.length) {
-			var one = new FoodValue(v, uiLayer);
+		for (v in 0 ... obj.Food.variants.length) {
+			var one = new ui.FoodValue(v, uiLayer);
 			one.x = 10 + v * 40;
 			one.y = Settings.UIHEIGHT/2;
 			valueTrackers.set(v, one);
 		}
+
 		// the actual point score.
-		score = new Score(uiLayer);
-		score.x = width * Tile.SIZE - 3;
+		score = new ui.Score(uiLayer);
+		score.x = width * obj.Tile.SIZE - 3;
 		score.y = Settings.UIHEIGHT/2;
 
-		// makes the shaders
-		var filtergroup = new h2d.filter.Group();
-		crt = new shaders.CRT();
-		bubble = new shaders.Bubble();
-		filtergroup.add(new h2d.filter.Shader(crt));
-		filtergroup.add(new h2d.filter.Shader(bubble));
-		s2d.filter = filtergroup;
+		// the menu
+		menu = new ui.Menu(width * obj.Tile.SIZE, height * obj.Tile.SIZE, uiLayer);
 
-		start();
-		onResize();
+		// makes the shaders
+		filtergroup = new h2d.filter.Group();
+		crt = new shaders.CRT();
+		crtFilter = new h2d.filter.Shader(crt);
+		filtergroup.add(crtFilter);
+		bubble = new shaders.Bubble();
+		bubbleFilter = new h2d.filter.Shader(bubble);
+		filtergroup.add(bubbleFilter);
+		s2d.filter = filtergroup;
 	}
 
 	private function start() {
@@ -173,7 +191,7 @@ class Game extends hxd.App {
 			if (tailQueue.length > 0) {
 				var food = tailQueue.shift();
 
-				var tail = new Tail(food, playerLayer);
+				var tail = new obj.Tail(food, playerLayer);
 				tail.setGridPosition(lastx, lasty);
 
 				score.value += valueTrackers.get(tail.variant).value;
@@ -234,8 +252,8 @@ class Game extends hxd.App {
 
 		var window = hxd.Window.getInstance();
 
-		var width = Tile.SIZE * this.width;
-		var height = Tile.SIZE * this.height;
+		var width = obj.Tile.SIZE * this.width;
+		var height = obj.Tile.SIZE * this.height;
 
 		var scalex = window.width / (width +  2 * Settings.ZOOMPADDING);
 		var scaley = window.height / (Settings.UIHEIGHT + height +  3 * Settings.ZOOMPADDING);
@@ -260,7 +278,18 @@ class Game extends hxd.App {
 	}
 
 	function onEvent(e : hxd.Event) {
-		if (e.kind == EKeyDown) {
+
+		if (e.kind == EKeyDown && Controls.is("cancel", e.keyCode)) {
+			toggleMenu();
+		}
+
+		// the menu items
+		if (menu.parent != null && e.kind == EKeyDown) {
+			menu.keypressed(e.keyCode);
+		}
+
+		// the ingame events
+		if (menu.parent == null && e.kind == EKeyDown) {
 			player.keypressed(e.keyCode);
 		}
 	}
@@ -269,7 +298,7 @@ class Game extends hxd.App {
 
 	private function makeFood() {
 		while (foods.length < foodLimit) {
-			var f = new Food(foodLayer);
+			var f = new obj.Food(foodLayer);
 
 			f.setGridPositionRandom([[player], cast(foods, Array<Dynamic>), tails, walls]);
 
@@ -297,4 +326,22 @@ class Game extends hxd.App {
 
 		}
 	}
+
+	/**
+	 * function to start the game, from the menu
+	 */
+	public function startGame() {
+		start();
+		uiLayer.removeChild(menu);
+	}
+
+	public function toggleMenu() {
+		if (menu.parent == null) uiLayer.addChild(menu);
+		else uiLayer.removeChild(menu);
+	}
+
+	public function setScanlinesEffect(state : Bool) crtFilter.enable = state;
+	public function hasScanlines() : Bool return crtFilter.enable;
+	public function setBubbleEffect(state : Bool) bubbleFilter.enable = state;
+	public function hasBubble() : Bool return bubbleFilter.enable;
 }

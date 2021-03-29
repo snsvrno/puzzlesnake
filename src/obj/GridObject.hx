@@ -1,3 +1,5 @@
+package obj;
+
 class GridObject extends h2d.Graphics {
 	/*** the standard grid size, of the base game grid */
 	inline static public var SIZE : Int = 16;
