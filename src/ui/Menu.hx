@@ -23,7 +23,7 @@ class Menu extends h2d.Object {
 
 	static private var startOptions : Array<ItemDef> = [
 		{ text : "Start Game!", onpressed : () -> Menu.instance.startGame() },
-		{ text : "Colors", choices : ["2","3","4","5"] },
+		{ text : "Colors", choices : ["2","3","4","5"], startingChoice: () -> '${Game.instance.colors}' },
 		{ text : "Back", onpressed : () -> Menu.instance.backMenu() },
 	];
 
@@ -150,7 +150,17 @@ class Menu extends h2d.Object {
 	}
 
 	public function startGame() {
-		while(menus.length > 1) backMenu();
+		
+		while(menus.length > 1) { 
+			var settings = backMenu();
+			for (s in settings.items) {
+				if (s.name == "Colors") {
+					Game.instance.colors = Std.parseInt(s.choice);
+				}
+			}
+		}
+
+		
 		Game.instance.startGame();
 	}
 	

@@ -7,6 +7,7 @@ class Game extends hxd.App {
 	////////////////////////////////////////////////////////////////////
 
 	private var tickTimer : Float = 0;
+	private var tickLength : Float = Settings.TICKLENGTH;
 
 	private var world : h2d.Object;
 
@@ -42,6 +43,17 @@ class Game extends hxd.App {
 	private var crt : shaders.CRT;
 	private var crtFilter : h2d.filter.Shader<shaders.CRT>;
 	private var filtergroup : h2d.filter.Group;
+
+	// gameplay options
+	public var colors : Int = 2;
+	private var tickIncreaseRate : Float = 0.95;
+	private var tickTripletRate : Float = 1.15;
+	
+	#if debug
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	private var tickLengthDisplay : h2d.Text;
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	#end
 
 	////////////////////////////////////////////////////////////////////
 
@@ -90,6 +102,14 @@ class Game extends hxd.App {
 
 		initUI();
 
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~
+		tickLengthDisplay = new h2d.Text(hxd.res.DefaultFont.get(), uiLayer);
+		tickLengthDisplay.x = 0;
+		tickLengthDisplay.y = 16;
+		// ~~~~~~~~~~~~~~~~~~~~~~~
+		#end
+
 		start();
 		onResize();
 	}
@@ -106,14 +126,6 @@ class Game extends hxd.App {
 		graphics.beginFill(0x222222);
 		graphics.drawRect(0,0,width * obj.Tile.SIZE, Settings.UIHEIGHT);
 		graphics.endFill();
-		
-		// the food scores
-		for (v in 0 ... obj.Food.variants.length) {
-			var one = new ui.FoodValue(v, uiLayer);
-			one.x = 10 + v * 40;
-			one.y = Settings.UIHEIGHT/2;
-			valueTrackers.set(v, one);
-		}
 
 		// the actual point score.
 		score = new ui.Score(uiLayer);
@@ -134,6 +146,22 @@ class Game extends hxd.App {
 		s2d.filter = filtergroup;
 	}
 
+	private function createFoodTrackers() {
+
+		for (k => v in valueTrackers) {
+			uiLayer.removeChild(v);
+			valueTrackers.remove(k);
+		}
+
+		// the food scores
+		for (v in 0 ... colors) {
+			var one = new ui.FoodValue(v, uiLayer);
+			one.x = 10 + v * 40;
+			one.y = Settings.UIHEIGHT/2;
+			valueTrackers.set(v, one);
+		}
+	}
+
 	private function start() {
 
 		// cleans up some stuff here.
@@ -147,12 +175,17 @@ class Game extends hxd.App {
 				grid[i][j].clearBlocking();
 			}
 		}
-		for (v => tracker in valueTrackers) tracker.reset();
+		// recreates the trackers
+		createFoodTrackers();
+
 		score.value = 0;
 
 		// setup the new stuff.
 		player.setGridPositionRandom(2);
 		player.setRandomDirection();
+
+		// need to reset the speed when we start a new game.
+		tickLength = Settings.TICKLENGTH;
 
 		makeFood();
 	}
@@ -164,8 +197,12 @@ class Game extends hxd.App {
 	override function update(dt:Float) {
 		super.update(dt);
 
+		#if debug
+		tickLengthDisplay.text = '${Math.floor(tickTimer*100)/100)} / ${Math.floor(tickLength*100)/100}';
+		#end
+
 		tickTimer += dt;
-		if (tickTimer > Settings.TICKLENGTH) {
+		if (tickTimer > tickLength) {
 			tickTimer = 0;
 
 			var lastx = player.gx;
@@ -197,6 +234,7 @@ class Game extends hxd.App {
 				score.value += valueTrackers.get(tail.variant).value;
 
 				// checks if we have 3 of a kind, if we should break the segments
+				// and make a wall.
 				if (tails.length >= 2 && tails[tails.length-1].variant == tails[tails.length-2].variant && tails[tails.length-1].variant == food.variant) {
 
 					// we got a match!
@@ -222,6 +260,9 @@ class Game extends hxd.App {
 					// increase the multiplier.
 					valueTrackers.get(tail.variant).increase();
 
+					// reset the time by some amount
+					tickLength *= tickTripletRate;
+
 				} else {
 
 					tails.push(tail);
@@ -235,9 +276,15 @@ class Game extends hxd.App {
 			// checks if he ate any food.
 			for (f in foods) {
 				if (f.gx == player.gx && f.gy == player.gy) {
+					// removes the food from the world
 					foods.remove(f);
 					f.remove();
+
+					// adds the food to the player
 					tailQueue.push(f);
+
+					// increments the speed! if we eat something.
+					tickLength *= tickIncreaseRate;
 				}
 			}
 
@@ -298,7 +345,7 @@ class Game extends hxd.App {
 
 	private function makeFood() {
 		while (foods.length < foodLimit) {
-			var f = new obj.Food(foodLayer);
+			var f = new obj.Food(colors, foodLayer);
 
 			f.setGridPositionRandom([[player], cast(foods, Array<Dynamic>), tails, walls]);
 
