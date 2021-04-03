@@ -13,8 +13,8 @@ class GridObject extends h2d.Graphics {
 	private var fillColor : Int = 0xFFFFFF;
 	private var fillOpactiy : Float = 1;
 
-	public var gx(default, null) : Int;
-	public var gy(default, null) : Int;
+	public var gx : Int;
+	public var gy : Int;
 
 	public function new(?parent : h2d.Object) {
 		super(parent);
@@ -35,6 +35,15 @@ class GridObject extends h2d.Graphics {
 		endFill();
 	}
 
+	public function setGridPosition(position : structures.GridPosition) {
+		trace(position);
+		x = position.cx;
+		y = position.cy;
+		gx = position.gx;
+		gy = position.gy;
+	}
+
+	/*
 	public function setGridPosition(newGx : Int, newGy : Int) : Bool {
 		gx = newGx;
 		gy = newGy;
@@ -42,11 +51,11 @@ class GridObject extends h2d.Graphics {
 		if (Settings.WORLDWRAP) {
 
 			// check if we need to wrap.
-			if (gx < 0) gx += Game.instance.width;
-			else if (gx >= Game.instance.width) gx -= Game.instance.width;
+			if (gx < 0) gx += game.Game.getwidth();
+			else if (gx >= game.Game.getwidth()) gx -= game.Game.getwidth();
 
-			if (gy < 0) gy += Game.instance.height;
-			else if (gy >= Game.instance.height) gy -= Game.instance.height;
+			if (gy < 0) gy += game.Game.getheight();
+			else if (gy >= game.Game.getheight()) gy -= game.Game.getheight();
 
 		} else {
 
@@ -54,16 +63,17 @@ class GridObject extends h2d.Graphics {
 			// its game over.
 
 			// check if have grid points that are outside the board.
-			if (gx < 0 || gx >= Game.instance.width || gy < 0 || gy >= Game.instance.height) return false;
+			if (gx < 0 || gx >= game.Game.getheight() || gy < 0 || gy >= game.Game.getheight()) return false;
 		}
 
-		var tile = Game.instance.grid[gx][gy];
+		var tile = game.Game.instance.grid.getTile(gx,gy);
 		
 		x = tile.x;
 		y = tile.y;
 
 		return true;
 	}
+	*/
 
 	/**
 	 * Sets a random position on the board.
@@ -71,10 +81,10 @@ class GridObject extends h2d.Graphics {
 	 * @param padding how many grids from the edge to not use (are not valid)
 	 * @param blockers grid objects that cannot be spawned inside of.
 	 */
-	public function setGridPositionRandom(?padding : Int = 0, ?blockers : Array<Array<Dynamic>>) {
+	/*public function setGridPositionRandom(?padding : Int = 0, ?blockers : Array<Array<Dynamic>>) {
 
-		var rx = Math.floor(padding + Math.random() * (Game.instance.width - 2 * padding - 1));
-		var ry = Math.floor(padding + Math.random() * (Game.instance.height - 2 * padding - 1));
+		var rx = Math.floor(padding + Math.random() * (game.Game.getwidth() - 2 * padding - 1));
+		var ry = Math.floor(padding + Math.random() * (game.Game.getheight() - 2 * padding - 1));
 
 		var valid = true;
 		if (blockers != null) {
@@ -87,12 +97,13 @@ class GridObject extends h2d.Graphics {
 		if (valid) setGridPosition(rx, ry);
 		else setGridPositionRandom(padding, blockers);
 	}
+	*/
 
 	public function collides(objects : Array<Dynamic>) : Bool {
 		for (o in objects) if (o.gx == gx && o.gy == gy) return true;
 		return false;
 	}
 
-	public function tick() : Bool { return true; }
+	// public function tick() : Bool { return true; }
 	public function getColor() : Int return fillColor;
 }

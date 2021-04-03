@@ -23,13 +23,13 @@ class Menu extends h2d.Object {
 
 	static private var startOptions : Array<ItemDef> = [
 		{ text : "Start Game!", onpressed : () -> Menu.instance.startGame() },
-		{ text : "Colors", choices : ["2","3","4","5"], startingChoice: () -> '${Game.instance.colors}' },
+		{ text : "Colors", choices : ["2","3","4","5"], startingChoice: () -> '${game.Game.instance.colors}' },
 		{ text : "Back", onpressed : () -> Menu.instance.backMenu() },
 	];
 
 	static private var settingsOptions : Array<ItemDef> = [
-		{ text : "CRT Effect", choices : ["On", "Off"], startingChoice : () -> if(Game.instance.hasBubble() == true) return "On" else return "Off" },
-		{ text : "Scanlines", choices : ["On", "Off"], startingChoice : () -> if(Game.instance.hasScanlines() == true) return "On" else return "Off" },
+		{ text : "CRT Effect", choices : ["On", "Off"], startingChoice : () -> if(game.Game.instance.hasBubble() == true) return "On" else return "Off" },
+		{ text : "Scanlines", choices : ["On", "Off"], startingChoice : () -> if(game.Game.instance.hasScanlines() == true) return "On" else return "Off" },
 		{ text : "Ok", onpressed : () -> Menu.instance.applySettings() },
 		{ text : "Cancel", onpressed : () -> Menu.instance.backMenu() },
 	];
@@ -139,11 +139,11 @@ class Menu extends h2d.Object {
 			if (s.choice != null) {
 				trace(s.name);
 				if (s.name == "CRT Effect") {
-					if (s.choice == "On") Game.instance.setBubbleEffect(true);
-					else Game.instance.setBubbleEffect(false);
+					if (s.choice == "On") game.Game.instance.setBubbleEffect(true);
+					else game.Game.instance.setBubbleEffect(false);
 				} else if (s.name == "Scanlines") {
-					if (s.choice == "On") Game.instance.setScanlinesEffect(true);
-					else Game.instance.setScanlinesEffect(false);
+					if (s.choice == "On") game.Game.instance.setScanlinesEffect(true);
+					else game.Game.instance.setScanlinesEffect(false);
 				}
 			}
 		}
@@ -155,13 +155,13 @@ class Menu extends h2d.Object {
 			var settings = backMenu();
 			for (s in settings.items) {
 				if (s.name == "Colors") {
-					Game.instance.colors = Std.parseInt(s.choice);
+					game.Game.instance.colors = Std.parseInt(s.choice);
 				}
 			}
 		}
 
 		
-		Game.instance.startGame();
+		game.Game.instance.startGame();
 	}
 	
 	public function keypressed(key : Int) {

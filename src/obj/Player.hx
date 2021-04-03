@@ -50,7 +50,7 @@ class Player extends GridObject {
 		endFill();
 	}
 
-	override function tick() : Bool {
+	public function tick() : { gx : Int, gy : Int } {
 		
 		var ngx : Int = gx;
 		var ngy : Int = gy;
@@ -64,8 +64,8 @@ class Player extends GridObject {
 		}
 
 		updateGraphics();
-
-		return setGridPosition(ngx, ngy);
+		
+		return { gx : ngx, gy : ngy };
 	}
 
 	public function setHeadColor(color : Int) {
