@@ -59,6 +59,9 @@ class Game extends core.Window {
 	public function new() {
 		super();
 		instance = this;
+
+		// loads the settings
+		Settings.load();
 	}
 
 	override function init() {
@@ -73,8 +76,8 @@ class Game extends core.Window {
 
 		// setting how big the world grid is so we have that too
 		// for when we need to resize and set the viewport
-		viewportHeight = grid.height * obj.Tile.SIZE;
-		viewportWidth = grid.width * obj.Tile.SIZE;
+		viewportHeight = grid.height * Settings.GRIDSIZE;
+		viewportWidth = grid.width * Settings.GRIDSIZE;
 		
 		player = new obj.Player(playerLayer);
 

@@ -2,11 +2,12 @@ package game;
 
 class Clock {
 	
-	private var timer : Float;
-	public var length : Float;
-
 	/*** the starting length of the timer. */
 	private var originalLength: Float;
+	/*** the actual timer, keeps track of the current time. */
+	private var timer : Float;
+	/*** the target of the timer, or the length of the timer. */
+	public var length : Float;
 
 	public function new(length : Float) {
 		originalLength = length;

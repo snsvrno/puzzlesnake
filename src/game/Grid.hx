@@ -1,7 +1,5 @@
 package game;
 
-import obj.GridObject;
-
 class Grid extends h2d.Object {
 
 	/*** the width of a grid cell in pixels.*/
@@ -42,8 +40,8 @@ class Grid extends h2d.Object {
 			var column = new Array<obj.Tile>();
 			for (j in 0 ... height) {
 				var tile = new obj.Tile(this);
-				tile.x = i * obj.Tile.SIZE + obj.Tile.SIZE/2;
-				tile.y = j * obj.Tile.SIZE + obj.Tile.SIZE/2;
+				tile.x = i * Settings.GRIDSIZE + Settings.GRIDSIZE/2;
+				tile.y = j * Settings.GRIDSIZE + Settings.GRIDSIZE/2;
 				column.push(tile);
 			}
 			cells.push(column);
@@ -78,7 +76,7 @@ class Grid extends h2d.Object {
 		var valid = true;
 		if (blockers != null) {
 			for (bset in blockers) for (b in bset) {
-				var gridobject = cast(b, GridObject);
+				var gridobject = cast(b, obj.GridObject);
 				if (rx == gridobject.gx && ry == gridobject.gy) valid = false;
 			}
 		}

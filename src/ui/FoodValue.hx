@@ -13,7 +13,7 @@ class FoodValue extends h2d.Graphics {
 		super(parent);
 
 		this.variant = variant;
-		fillColor = obj.Food.variants[variant];
+		fillColor = Settings.getFoodColor(variant);
 		size = 6;
 
 		text = new h2d.Text(hxd.res.DefaultFont.get(), this);

@@ -2,15 +2,6 @@ package obj;
 
 class Food extends GridObject {
 
-	static public var variants : Array<Int> = [
-		0xEF5412, // red
-		0xf5e400, // yellow
-		0x0662FE, // blue
-		0x12FF23, // green
-		0xc840f5, // violet
-		0xcc7b02, // orange
-	];
-
 	public var variant : Int;
 
 	public function new(?variantupperlimit : Int, ?parent : h2d.Object) {
@@ -22,8 +13,9 @@ class Food extends GridObject {
 	}
 
 	public function setVariant(?upperlimit : Int) {
-		if (upperlimit == null) upperlimit = variants.length;
+		if (upperlimit == null) upperlimit = 6;
+
 		variant = Math.floor(Math.random()*upperlimit);
-		fillColor = variants[variant];
+		fillColor = Settings.getFoodColor(variant);
 	}
 }
