@@ -28,6 +28,8 @@ class Window extends hxd.App {
 	/*** the viewport size so we know how to resize the world to the window */
 	private var viewportHeight : Int;
 
+	private var viewportPadding : structures.Padding = new structures.Padding();
+
 	/**
 	 * a fake scene layer where all the game stuff will be, so we 
 	 * can better control the scale and positioning.
@@ -92,16 +94,16 @@ class Window extends hxd.App {
 		// adjust the scale of the game world object.
 		// calculates the zoom for the x and y direction based on the zoom
 		// settings
-		var scalex = window.width / (viewportWidth +  2 * Settings.ZOOMPADDING);
-		var scaley = window.height / (Settings.UIHEIGHT + viewportHeight +  3 * Settings.ZOOMPADDING);
+		var scalex = (window.width - viewportPadding.left - viewportPadding.right) / (viewportWidth);
+		var scaley = (window.height - viewportPadding.top - viewportPadding.bottom) / (viewportHeight);
 		// sets the min to the layer.
 		world.setScale(Math.min(scalex, scaley));
 		// moves the position so that the world is centered.
 		// this doesn't move to the center of the world (0,0 aligned to center) because i started it
 		// with 0,0 being top left and then added ui in the negative relm ... not sure why that was a
 		// good idea? but that happened.
-		world.x = (window.width - viewportWidth * world.scaleX)/2;
-		world.y = Settings.UIHEIGHT * world.scaleY + (window.height - (viewportHeight + Settings.UIHEIGHT) * world.scaleY)/2;
+		world.x = viewportPadding.left + (window.width - viewportWidth * world.scaleX - viewportPadding.left - viewportPadding.right)/2;
+		world.y = viewportPadding.top + (window.height - viewportHeight * world.scaleY - viewportPadding.top - viewportPadding.bottom)/2;
 
 		// update the background fill.
 		backgroundFill.clear();

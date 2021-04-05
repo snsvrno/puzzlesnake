@@ -78,6 +78,7 @@ class Game extends core.Window {
 		// for when we need to resize and set the viewport
 		viewportHeight = grid.height * Settings.GRIDSIZE;
 		viewportWidth = grid.width * Settings.GRIDSIZE;
+		viewportPadding = new structures.Padding(10,10,10,10);
 		
 		player = new obj.Player(playerLayer);
 
