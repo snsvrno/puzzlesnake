@@ -1,7 +1,7 @@
 # workspace stuff
 .vscode
 *.code-workspace
-build.hxml
+/*.hxml
 
 # compiled stuffs
 bin
