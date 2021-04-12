@@ -83,7 +83,7 @@ class Grid extends h2d.Object {
 
 		if (valid) { 
 			var tile = cells[rx][ry];
-			return { gx : rx, gy : ry, cx : tile.x, cy : tile.y };
+			return { gx : rx, gy : ry, cx : tile.x + x, cy : tile.y + y };
 		} else return getRandomPosition(padding, blockers);
 
 	}
@@ -115,8 +115,8 @@ class Grid extends h2d.Object {
 		
 		return {
 			gx : gx, gy : gy,
-			cx : tile.x,
-			cy : tile.y,
+			cx : tile.x + x,
+			cy : tile.y + y,
 		};
 
 	}

@@ -16,41 +16,42 @@ class Game extends core.Window {
 
 	public var grid : game.Grid;
 
+	public var ui : ui.Manager;
+
 	// organizational objects
 	//public var grid : Array<Array<obj.Tile>>;
 	private var foods : Array<obj.Food> = [];
 	private var tails : Array<obj.Tail> = [];
 	private var walls : Array<obj.Tail> = [];
 
-	// layers
+	// layers that contain all the sprites / display objects for the game.
+	// doing this route so I can manage draw order and easily show / hide
+	// different types of stuff.
 	private var playerLayer : h2d.Object;
-	//private var tileLayer : h2d.Object;
 	private var wallsLayer : h2d.Object;
 	private var foodLayer : h2d.Object;
-	private var uiLayer : h2d.Object;
+	// private var uiLayer : h2d.Object;
 
 	// trackers and variables
 	/*** how many foods should exist. */
-	private var foodLimit : Int = 3;
 	private var tailQueue : Array<obj.Food> = [];
 	private var player : obj.Player;
 
-	// the ui stuff
-	private var valueTrackers : Map<Int, ui.FoodValue> = new Map();
-	private var score : ui.Score;
-	// private var blankSpace : h2d.Graphics;
-	private var menu : ui.Menu;
+	/*** all the specific gamplay options */
+	private var options : structures.GameplayOptions;
 
-	// gameplay options
-	public var colors : Int = 2;
-	private var tickIncreaseRate : Float = 0.95;
-	private var tickTripletRate : Float = 1.15;
+	// the ui stuff
+	//private var valueTrackers : Map<Int, ui.FoodValue> = new Map();
+	//private var score : ui.Score;
+	// private var blankSpace : h2d.Graphics;
+	//private var menu : ui.Menu;
 
 	////////////////////////////////////////////////////////////////////
 	
+	
 	#if debug
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	private var tickLengthDisplay : h2d.Text;
+	// private var tickLengthDisplay : h2d.Text;
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#end
 
@@ -67,28 +68,42 @@ class Game extends core.Window {
 	override function init() {
 		super.init();
 
-		clock = new Clock(Settings.TICKLENGTH);
+		// sets the default options
+		options = {
+			wallLength: 3,
+			colors: 2,
+			startingTickSpeed: 0.25,
+			tickMakeWall: 1.15,
+			tickEatFood: 0.95,
+			foodLimit: 3,
+		};
+
+		clock = new Clock(options.startingTickSpeed);
 
 		foodLayer = new h2d.Object(world);
 		wallsLayer = new h2d.Object(world);
 		playerLayer = new h2d.Object(world);
 		grid = new game.Grid(Settings.GRIDWIDTH, Settings.GRIDHEIGHT, world);
 
+		var uiheight = 20;
+
 		// setting how big the world grid is so we have that too
 		// for when we need to resize and set the viewport
-		viewportHeight = grid.height * Settings.GRIDSIZE;
+		viewportHeight = grid.height * Settings.GRIDSIZE + uiheight;
 		viewportWidth = grid.width * Settings.GRIDSIZE;
-		viewportPadding = new structures.Padding(10,10,10,10);
+		viewportPadding = new structures.Padding(50,50,50,50);
 		
 		player = new obj.Player(playerLayer);
 
-		initUI();
+		// initUI();
+		ui = new ui.Manager(viewportWidth, uiheight, world);
+		grid.y = uiheight;
 
 		#if debug
 		// ~~~~~~~~~~~~~~~~~~~~~~~
-		tickLengthDisplay = new h2d.Text(hxd.res.DefaultFont.get(), uiLayer);
-		tickLengthDisplay.x = 0;
-		tickLengthDisplay.y = 16;
+		//tickLengthDisplay = new h2d.Text(hxd.res.DefaultFont.get(), uiLayer);
+		//tickLengthDisplay.x = 0;
+		//tickLengthDisplay.y = 16;
 		// ~~~~~~~~~~~~~~~~~~~~~~~
 		#end
 
@@ -96,6 +111,7 @@ class Game extends core.Window {
 		onResize();
 	}
 
+	/*
 	private function initUI() {
 
 		// setup the UI elements
@@ -116,23 +132,7 @@ class Game extends core.Window {
 
 		// the menu
 		menu = new ui.Menu(viewportWidth, viewportHeight, uiLayer);
-	}
-
-	private function createFoodTrackers() {
-
-		for (k => v in valueTrackers) {
-			uiLayer.removeChild(v);
-			valueTrackers.remove(k);
-		}
-
-		// the food scores
-		for (v in 0 ... colors) {
-			var one = new ui.FoodValue(v, uiLayer);
-			one.x = 10 + v * 40;
-			one.y = Settings.UIHEIGHT/2;
-			valueTrackers.set(v, one);
-		}
-	}
+	}*/
 
 	private function start() {
 		clock.reset();
@@ -153,7 +153,6 @@ class Game extends core.Window {
 		// makes some new food
 		makeFood();
 
-
 		/////////////////////////////////////////////
 		// WALLS AND GRID
 		// removes all the set walls.
@@ -164,9 +163,9 @@ class Game extends core.Window {
 
 		//////////////////////////////////////////////
 		// UI AND TRACKING
-		score.value = 0;
+		//score.value = 0;
 		// creates the trackers based on the used foods.
-		createFoodTrackers();
+		ui.createFoodIndicators(options.colors);
 
 	}
 
@@ -216,7 +215,7 @@ class Game extends core.Window {
 			tails.push(tail);
 
 			// adds the score.
-			score.value += valueTrackers.get(tail.variant).value;
+			// score.value += valueTrackers.get(tail.variant).value;
 
 			// checks if we got the requesits for wall.
 			if (makeAWall()) {
@@ -235,10 +234,10 @@ class Game extends core.Window {
 				updateEdgeGrid();
 
 				// adjust the multiplier.
-				valueTrackers.get(tail.variant).increase();
+				ui.getFood(tail.variant).increase();
 				
 				// reset the time by some amount
-				clock.length *= tickTripletRate;
+				clock.length *= options.tickMakeWall;
 			}
 
 			// update your color to the tail color
@@ -249,6 +248,13 @@ class Game extends core.Window {
 		// CHECKS ON THE EATING!
 		for (f in foods) {
 			if (f.gx == player.gx && f.gy == player.gy) {
+
+				#if debug
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				trace('ate food ${f.variant} at ${f.gx}, ${f.gy}');
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				#end
+
 				// removes the food from the world
 				foods.remove(f);
 				f.remove();
@@ -257,7 +263,7 @@ class Game extends core.Window {
 				tailQueue.push(f);
 
 				// increments the speed! if we eat something.
-				clock.length *= tickIncreaseRate;
+				clock.length *= options.tickEatFood;
 			}
 		}
 
@@ -271,7 +277,7 @@ class Game extends core.Window {
 		super.update(dt);
 
 		#if debug
-		tickLengthDisplay.text = clock.debug_get_string();
+		// tickLengthDisplay.text = clock.debug_get_string();
 		#end
 
 		if (clock.update(dt)) tick();
@@ -279,17 +285,17 @@ class Game extends core.Window {
 
 	override function onEvent(e : hxd.Event) {
 
-		if (e.kind == EKeyDown && Controls.is("cancel", e.keyCode)) {
+		/*if (e.kind == EKeyDown && Controls.is("cancel", e.keyCode)) {
 			toggleMenu();
-		}
+		}*/
 
 		// the menu items
-		if (menu.parent != null && e.kind == EKeyDown) {
+		/*if (menu.parent != null && e.kind == EKeyDown) {
 			menu.keypressed(e.keyCode);
-		}
+		}*/
 
 		// the ingame events
-		if (menu.parent == null && e.kind == EKeyDown) {
+		if (/*menu.parent == null && */e.kind == EKeyDown) {
 			player.keypressed(e.keyCode);
 		}
 	}
@@ -298,9 +304,9 @@ class Game extends core.Window {
 
 	
 	private function makeFood() {
-		while (foods.length < foodLimit) {
+		while (foods.length < options.foodLimit) {
 			var position = grid.getRandomPosition([[player], cast(foods, Array<Dynamic>), tails, walls]);
-			var f = new obj.Food(colors, foodLayer);
+			var f = new obj.Food(options.colors, foodLayer);
 			f.setGridPosition(position);
 			foods.push(f);
 		}
@@ -332,13 +338,13 @@ class Game extends core.Window {
 	 */
 	public function startGame() {
 		start();
-		uiLayer.removeChild(menu);
+		//uiLayer.removeChild(menu);
 	}
 
-	public function toggleMenu() {
+	/*public function toggleMenu() {
 		if (menu.parent == null) uiLayer.addChild(menu);
 		else uiLayer.removeChild(menu);
-	}
+	}*/
 
 	private function makeAWall() : Bool {
 		// first we makes sure we have enough tail pieces to check
@@ -361,8 +367,8 @@ class Game extends core.Window {
 		return false;
 	}
 
-	public function setScanlinesEffect(state : Bool) crtFilter.enable = state;
+	/*public function setScanlinesEffect(state : Bool) crtFilter.enable = state;
 	public function hasScanlines() : Bool return crtFilter.enable;
 	public function setBubbleEffect(state : Bool) bubbleFilter.enable = state;
-	public function hasBubble() : Bool return bubbleFilter.enable;
+	public function hasBubble() : Bool return bubbleFilter.enable;*/
 }
