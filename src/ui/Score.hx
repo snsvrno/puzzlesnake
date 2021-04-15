@@ -19,7 +19,6 @@ class Score extends h2d.Object {
     private function updateDisplay() {
         textObject.text = '$value';
         textObject.x = -1 * textObject.textWidth;
-        textObject.y = -1 * textObject.textHeight/2; 
-        trace('updatedisplay');
+        textObject.y = -1 * textObject.textHeight/2;
     }
 }

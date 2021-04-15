@@ -8,7 +8,15 @@ class Game extends core.Window {
 	static public function getwidth() : Int return instance.grid.width;
 	static public function getheight() : Int return instance.grid.height; 
 
+	#if debug
+	static public function log(text : String) instance.console.log(text);
+	#end
+
 	////////////////////////////////////////////////////////////////////
+
+	#if debug
+	private var console : h2d.Console;
+	#end
 
 	// the time keeping clock, is adjusted based on eating and
 	// making walls.
@@ -105,6 +113,8 @@ class Game extends core.Window {
 		//tickLengthDisplay.x = 0;
 		//tickLengthDisplay.y = 16;
 		// ~~~~~~~~~~~~~~~~~~~~~~~
+		console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
+		log('console started');
 		#end
 
 		start();
@@ -220,6 +230,9 @@ class Game extends core.Window {
 
 			// checks if we got the requesits for wall.
 			if (makeAWall()) {
+
+				log('making a wall');
+
 				// we need to remove the tail segments, convert them
 				// to walls and keep them in place.
 				for (_ in 0 ... Settings.WALLBUILDLENGTH) {
@@ -266,7 +279,7 @@ class Game extends core.Window {
 
 		#if debug
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		trace('ate food ${f.variant} at ${f.gx}, ${f.gy}');
+		log('ate food ${f.variant} at ${f.gx}, ${f.gy}');
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#end
 

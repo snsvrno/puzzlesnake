@@ -48,6 +48,8 @@ class Manager extends h2d.Object {
             score = new ui.Score(this);
             score.x = width - height/2;
             score.y = height/2;
+        } else {
+            score.value = 0;
         }
     }
 
@@ -59,11 +61,8 @@ class Manager extends h2d.Object {
     }
 
     public function getFood(variant : Int) : Null<ui.Food> {
-        trace(variant);
         for (f in foods) {
-            trace('${f.variant} == $variant');
             if (f.variant == variant) { 
-                trace(f);
                 return f;
             }
         }
