@@ -3,6 +3,7 @@ package obj;
 class Food extends GridObject {
 
 	public var variant : Int;
+	public var value : Int = 1;
 
 	public function new(?variantupperlimit : Int, ?parent : h2d.Object) {
 		super(parent);

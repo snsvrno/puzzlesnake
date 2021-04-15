@@ -5,6 +5,7 @@ class Manager extends h2d.Object {
     private var background : h2d.Graphics;
 
     private var foods : Array<ui.Food> = [];
+    private var score : Null<ui.Score>;
 
     public final height : Int;
     public final width : Int;
@@ -42,6 +43,14 @@ class Manager extends h2d.Object {
         }
     }
 
+    public function createScore() {
+        if (score == null) { 
+            score = new ui.Score(this);
+            score.x = width - height/2;
+            score.y = height/2;
+        }
+    }
+
     /**
      * Removes all the existing food indicator items.
      */
@@ -60,5 +69,9 @@ class Manager extends h2d.Object {
         }
         return null;
     }   
+
+    public function updateScore(valueToAdd : Int) {
+        if (score != null) score.value += valueToAdd;
+    }
 
 }

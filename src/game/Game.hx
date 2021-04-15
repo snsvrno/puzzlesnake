@@ -166,6 +166,7 @@ class Game extends core.Window {
 		//score.value = 0;
 		// creates the trackers based on the used foods.
 		ui.createFoodIndicators(options.colors);
+		ui.createScore();
 
 	}
 
@@ -248,22 +249,7 @@ class Game extends core.Window {
 		// CHECKS ON THE EATING!
 		for (f in foods) {
 			if (f.gx == player.gx && f.gy == player.gy) {
-
-				#if debug
-				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				trace('ate food ${f.variant} at ${f.gx}, ${f.gy}');
-				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				#end
-
-				// removes the food from the world
-				foods.remove(f);
-				f.remove();
-
-				// adds the food to the player
-				tailQueue.push(f);
-
-				// increments the speed! if we eat something.
-				clock.length *= options.tickEatFood;
+				eatFood(f);
 			}
 		}
 
@@ -271,6 +257,31 @@ class Game extends core.Window {
 		// REPOPULATES FOOD.
 		makeFood();
 
+	}
+
+	/**
+	 * eats the food and does whatever else needs to be done.
+	 */
+	private function eatFood(f : obj.Food) {
+
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		trace('ate food ${f.variant} at ${f.gx}, ${f.gy}');
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#end
+
+		// removes the food from the world
+		foods.remove(f);
+		f.remove();
+
+		// adds the food to the player
+		tailQueue.push(f);
+
+		// increments the speed! if we eat something.
+		clock.length *= options.tickEatFood;
+
+		// updates the score.
+		ui.updateScore(ui.getFood(f.variant).value * f.value);
 	}
 
 	override function update(dt:Float) {
