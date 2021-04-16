@@ -40,8 +40,8 @@ class Grid extends h2d.Object {
 			var column = new Array<obj.Tile>();
 			for (j in 0 ... height) {
 				var tile = new obj.Tile(this);
-				tile.x = i * Settings.GRIDSIZE + Settings.GRIDSIZE/2;
-				tile.y = j * Settings.GRIDSIZE + Settings.GRIDSIZE/2;
+				tile.x = i * settings.Grid.SIZE + settings.Grid.SIZE/2;
+				tile.y = j * settings.Grid.SIZE + settings.Grid.SIZE/2;
 				column.push(tile);
 			}
 			cells.push(column);
@@ -90,7 +90,7 @@ class Grid extends h2d.Object {
 
 	public function getScreenPosition(gx : Int, gy : Int) : Null<structures.GridPosition> {
 
-		if (Settings.WORLDWRAP) {
+		if (settings.Game.WORLD_WRAP) {
 
 			// check if we need to wrap.
 			if (gx < 0) gx += width;

@@ -3,19 +3,60 @@ package game;
 class Game extends core.Window {
 
 	////////////////////////////////////////////////////////////////////
+	// STATIC STUFF
 
 	static public var instance : Game;
+
 	static public function getwidth() : Int return instance.grid.width;
-	static public function getheight() : Int return instance.grid.height; 
+	static public function getheight() : Int return instance.grid.height;
+
+	static public function newGame() { 
+		
+		// we remove all the menus
+		while (instance.menu.length > 0) shiftMenu();
+	
+		instance.start();
+	}
+
+	static public function setMenu(menu : menu.Menu) {
+
+		// remove the current menu from the display.
+		if (instance.menu[0] != null) {
+			instance.world.removeChild(instance.menu[0]);
+		}
+
+		// adds this new menu to the front.
+		instance.menu.unshift(menu);
+		instance.world.addChild(menu);
+	}
+
+	/*** removes the currently active menu. */
+	static public function shiftMenu() {
+		var menu = instance.menu.shift();
+		if (menu != null) {
+			instance.world.removeChild(menu);
+
+			// if we have more menu items then lets set the next one
+			if (instance.menu.length > 0) instance.world.addChild(instance.menu[0]);
+			// if we don't have any more then let's check if we are paused
+			// and then unpause the game.
+			else if (instance.pause) instance.pause = false;
+		}
+	}
 
 	#if debug
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	static public function log(text : String) instance.console.log(text);
+	static public var debug_graphics : debug.BoundsManager = new debug.BoundsManager();
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#end
 
 	////////////////////////////////////////////////////////////////////
 
 	#if debug
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	private var console : h2d.Console;
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#end
 
 	// the time keeping clock, is adjusted based on eating and
@@ -26,8 +67,9 @@ class Game extends core.Window {
 
 	public var ui : ui.Manager;
 
+	public var menu : Array<menu.Menu> = [];
+
 	// organizational objects
-	//public var grid : Array<Array<obj.Tile>>;
 	private var foods : Array<obj.Food> = [];
 	private var tails : Array<obj.Tail> = [];
 	private var walls : Array<obj.Tail> = [];
@@ -47,21 +89,7 @@ class Game extends core.Window {
 
 	/*** all the specific gamplay options */
 	private var options : structures.GameplayOptions;
-
-	// the ui stuff
-	//private var valueTrackers : Map<Int, ui.FoodValue> = new Map();
-	//private var score : ui.Score;
-	// private var blankSpace : h2d.Graphics;
-	//private var menu : ui.Menu;
-
-	////////////////////////////////////////////////////////////////////
-	
-	
-	#if debug
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// private var tickLengthDisplay : h2d.Text;
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	#end
+	private var pause : Bool = false;
 
 	////////////////////////////////////////////////////////////////////
 
@@ -91,14 +119,14 @@ class Game extends core.Window {
 		foodLayer = new h2d.Object(world);
 		wallsLayer = new h2d.Object(world);
 		playerLayer = new h2d.Object(world);
-		grid = new game.Grid(Settings.GRIDWIDTH, Settings.GRIDHEIGHT, world);
+		grid = new game.Grid(settings.Game.GRID_WIDTH, settings.Game.GRID_HEIGHT, world);
 
 		var uiheight = 20;
 
 		// setting how big the world grid is so we have that too
 		// for when we need to resize and set the viewport
-		viewportHeight = grid.height * Settings.GRIDSIZE + uiheight;
-		viewportWidth = grid.width * Settings.GRIDSIZE;
+		viewportHeight = grid.height * settings.Grid.SIZE + uiheight;
+		viewportWidth = grid.width * settings.Grid.SIZE;
 		viewportPadding = new structures.Padding(50,50,50,50);
 		
 		player = new obj.Player(playerLayer);
@@ -107,43 +135,28 @@ class Game extends core.Window {
 		ui = new ui.Manager(viewportWidth, uiheight, world);
 		grid.y = uiheight;
 
-		#if debug
-		// ~~~~~~~~~~~~~~~~~~~~~~~
-		//tickLengthDisplay = new h2d.Text(hxd.res.DefaultFont.get(), uiLayer);
-		//tickLengthDisplay.x = 0;
-		//tickLengthDisplay.y = 16;
-		// ~~~~~~~~~~~~~~~~~~~~~~~
-		console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
-		log('console started');
-		#end
+		// creates the starting menu
+		setMenu(menus.Main.main(viewportWidth, viewportHeight));
 
 		start();
 		onResize();
+
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~
+
+		console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
+		console.addCommand("debug", [{ name : "state", opt : false, t : h2d.Console.ConsoleArg.ABool }], debug_graphics.show);
+		log('console started');
+		// sets all the graphics to hide by default.
+		debug_graphics.show(false);
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~
+		#end
 	}
 
-	/*
-	private function initUI() {
-
-		// setup the UI elements
-		uiLayer = new h2d.Object(world);
-		uiLayer.y = - Settings.UIHEIGHT;
-		
-		// the ui background bar.
-		var graphics = new h2d.Graphics(uiLayer);
-		graphics.lineStyle(1,0x222222);
-		graphics.beginFill(0x222222);
-		graphics.drawRect(0,0,viewportWidth, Settings.UIHEIGHT);
-		graphics.endFill();
-
-		// the actual point score.
-		score = new ui.Score(uiLayer);
-		score.x = viewportWidth - 3;
-		score.y = Settings.UIHEIGHT/2;
-
-		// the menu
-		menu = new ui.Menu(viewportWidth, viewportHeight, uiLayer);
-	}*/
-
+	/**
+	 * configures the game for a new play session (a new game)
+	 */
 	private function start() {
 		clock.reset();
 
@@ -235,7 +248,7 @@ class Game extends core.Window {
 
 				// we need to remove the tail segments, convert them
 				// to walls and keep them in place.
-				for (_ in 0 ... Settings.WALLBUILDLENGTH) {
+				for (_ in 0 ... settings.Game.WALL_BUILD_LENGTH) {
 					var segment = tails.pop();
 					segment.setWall();
 					// playerLayer.removeChild(segment);
@@ -300,27 +313,54 @@ class Game extends core.Window {
 	override function update(dt:Float) {
 		super.update(dt);
 
-		#if debug
-		// tickLengthDisplay.text = clock.debug_get_string();
-		#end
+		if (pause) return;
 
 		if (clock.update(dt)) tick();
 	}
 
 	override function onEvent(e : hxd.Event) {
 
-		/*if (e.kind == EKeyDown && Controls.is("cancel", e.keyCode)) {
-			toggleMenu();
-		}*/
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// open the console
+		if (e.kind == EKeyDown && e.keyCode == hxd.Key.QWERTY_TILDE) {
+			// toggles the console.
+			if (console.isActive()) console.hide();
+			else console.show();
 
-		// the menu items
-		/*if (menu.parent != null && e.kind == EKeyDown) {
-			menu.keypressed(e.keyCode);
-		}*/
+			// we cancel checking the rest of items for events.
+			return;
+		}
 
-		// the ingame events
-		if (/*menu.parent == null && */e.kind == EKeyDown) {
-			player.keypressed(e.keyCode);
+		// check if the console is open, and if it is then we
+		// ignore all event processing.
+		if (console.isActive()) return;
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#end
+
+		if (menu.length > 0) {
+			// if we have menus in the stack then all the inputs
+			// will be sent to the menu.
+
+			if (e.kind == EKeyDown) menu[0].keypressed(e.keyCode);
+
+		} else {
+
+			if (e.kind == EKeyDown) {
+
+				if (Controls.is("cancel", e.keyCode)) {
+					// we hit the cancel button which starts the menu.
+					setMenu(menus.Main.main(viewportWidth, viewportHeight));
+
+					// we should also pause the game if we are actually playing a game
+					pause = true;
+
+					return;
+				}
+
+				player.keypressed(e.keyCode);
+			}
+
 		}
 	}
 
@@ -357,28 +397,15 @@ class Game extends core.Window {
 		}
 	}
 
-	/**
-	 * function to start the game, from the menu
-	 */
-	public function startGame() {
-		start();
-		//uiLayer.removeChild(menu);
-	}
-
-	/*public function toggleMenu() {
-		if (menu.parent == null) uiLayer.addChild(menu);
-		else uiLayer.removeChild(menu);
-	}*/
-
 	private function makeAWall() : Bool {
 		// first we makes sure we have enough tail pieces to check
 		// for a wall.
-		if (tails.length >= Settings.WALLBUILDLENGTH) {
+		if (tails.length >= settings.Game.WALL_BUILD_LENGTH) {
 			// the last color, now we make sure all of the colors
 			// for the requisit length are the same.
 			var variant : Int = tails[tails.length-1].variant;
 			var passed = true;
-			for (i in 1 ... Settings.WALLBUILDLENGTH) {
+			for (i in 1 ... settings.Game.WALL_BUILD_LENGTH) {
 				if (tails[tails.length - 1 - i].variant != variant) {
 					passed = false;
 					break;
@@ -390,9 +417,4 @@ class Game extends core.Window {
 
 		return false;
 	}
-
-	/*public function setScanlinesEffect(state : Bool) crtFilter.enable = state;
-	public function hasScanlines() : Bool return crtFilter.enable;
-	public function setBubbleEffect(state : Bool) bubbleFilter.enable = state;
-	public function hasBubble() : Bool return bubbleFilter.enable;*/
 }

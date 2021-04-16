@@ -12,27 +12,27 @@ class Tile extends h2d.Graphics {
 	private function updateGraphics() {
 		clear();
 		
-		lineStyle(Settings.GRIDTHICKNESS, Settings.GRIDCOLOR, Settings.GRIDOPACITY);
-		drawRect(-Settings.GRIDSIZE/2,-Settings.GRIDSIZE/2,Settings.GRIDSIZE,Settings.GRIDSIZE);
+		lineStyle(settings.Grid.LINESIZE, settings.Grid.COLOR, settings.Grid.OPACITY);
+		drawRect(-settings.Grid.SIZE/2,-settings.Grid.SIZE/2,settings.Grid.SIZE,settings.Grid.SIZE);
 
 		for (direction => color in blockings) {
-			lineStyle(Settings.GRIDTHICKNESS, color);
+			lineStyle(settings.Grid.LINESIZE, color);
 			switch(direction) {
 				case Up: 
-					moveTo(-Settings.GRIDSIZE/2, -Settings.GRIDSIZE/2);
-					lineTo(Settings.GRIDSIZE/2, -Settings.GRIDSIZE/2);
+					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
+					lineTo(settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
 
 				case Down:
-					moveTo(-Settings.GRIDSIZE/2, Settings.GRIDSIZE/2);
-					lineTo(Settings.GRIDSIZE/2, Settings.GRIDSIZE/2);
+					moveTo(-settings.Grid.SIZE/2, settings.Grid.SIZE/2);
+					lineTo(settings.Grid.SIZE/2, settings.Grid.SIZE/2);
 					
 				case Left:
-					moveTo(-Settings.GRIDSIZE/2, -Settings.GRIDSIZE/2);
-					lineTo(-Settings.GRIDSIZE/2, Settings.GRIDSIZE/2);
+					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
+					lineTo(-settings.Grid.SIZE/2, settings.Grid.SIZE/2);
 
 				case Right:
-					moveTo(Settings.GRIDSIZE/2, -Settings.GRIDSIZE/2);
-					lineTo(Settings.GRIDSIZE/2, Settings.GRIDSIZE/2);
+					moveTo(settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
+					lineTo(settings.Grid.SIZE/2, settings.Grid.SIZE/2);
 			}
 		}
 	}

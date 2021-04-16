@@ -2,7 +2,7 @@ package obj;
 
 class GridObject extends h2d.Graphics {
 	/*** the standard grid size, of the base game grid */
-	private var size : Int = Settings.GRIDSIZE;
+	private var size : Int = settings.Grid.SIZE;
 
 	private var outlineColor : Int = 0xFF00FF;
 	private var outlineSize : Int = 0;

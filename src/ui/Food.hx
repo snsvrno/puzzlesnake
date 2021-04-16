@@ -4,7 +4,7 @@ class Food extends h2d.Graphics {
 
     public var width(get, null) : Int;
     private function get_width() : Int {
-        return Math.ceil(Settings.UIFOODSIZE + 2 + textValue.textWidth);
+        return Math.ceil(settings.Ui.FOOD_SIZE + 2 + textValue.textWidth);
     }
 
     private var textValue : h2d.Text;
@@ -20,13 +20,13 @@ class Food extends h2d.Graphics {
         var color = Settings.getFoodColor(variant);
 
         beginFill(color);
-        drawRect(-Settings.UIFOODSIZE/2, -Settings.UIFOODSIZE/2, Settings.UIFOODSIZE, Settings.UIFOODSIZE);
+        drawRect(-settings.Ui.FOOD_SIZE/2, -settings.Ui.FOOD_SIZE/2, settings.Ui.FOOD_SIZE, settings.Ui.FOOD_SIZE);
         endFill();
 
         // sets up the text.
         textValue = new h2d.Text(hxd.res.DefaultFont.get(), this);
         updateValue();
-        textValue.x = Settings.UIFOODSIZE/2 + 2;
+        textValue.x = settings.Ui.FOOD_SIZE/2 + 2;
         textValue.y = -textValue.textHeight/2 - 1;
     }
 

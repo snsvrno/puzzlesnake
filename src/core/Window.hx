@@ -68,7 +68,7 @@ class Window extends hxd.App {
 		bubble = new shaders.Bubble();
 		bubbleFilter = new h2d.filter.Shader(bubble);
 		// set the background fill color so there isn't any 'black'
-		bubble.backgroundColor.setColor(Settings.BGCOLOR);
+		bubble.backgroundColor.setColor(settings.Game.BACKGROUND_COLOR);
 		//filterEffects.add(bubbleFilter);
 	}
 
@@ -107,7 +107,7 @@ class Window extends hxd.App {
 
 		// update the background fill.
 		backgroundFill.clear();
-		backgroundFill.beginFill(Settings.BGCOLOR);
+		backgroundFill.beginFill(settings.Game.BACKGROUND_COLOR);
 		backgroundFill.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		backgroundFill.endFill();
 
