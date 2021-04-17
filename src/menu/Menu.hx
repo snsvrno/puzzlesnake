@@ -16,7 +16,12 @@ class Menu extends h2d.Object {
 
     private var items : Array<Item> = [];
     private var selectedItem : Int = 0;
+
     private var background : h2d.Graphics;
+
+    private var title : Null<h2d.Object>;
+    private var description : Null<h2d.Text>;
+    
 
     ///////////////////////////////////////
     // dimentional information
@@ -32,13 +37,29 @@ class Menu extends h2d.Object {
     ///////////////////////////////////////////////////////////////////////////
     // INITIALIZATION
 
-    public function new(width : Int, height : Int, ?parent : h2d.Object) {
+    public function new(width : Int, height : Int, ?title : String, ?parent : h2d.Object) {
         super(parent);
 
         this.width = width;
         this.height = height;
 
         background = new h2d.Graphics(this);
+
+        if (title != null) {
+            this.title = new h2d.Object(this);
+
+            // the text, aligning middle, bottom.
+            var titleObject = new h2d.Text(hxd.res.DefaultFont.get(), this.title);
+            titleObject.text = title;
+            titleObject.y = -titleObject.textHeight * titleObject.scaleY - 2;
+            titleObject.x = -titleObject.textWidth/2 * titleObject.scaleX;
+
+            var decorations = new h2d.Graphics(this.title);
+            var lineHalfWidth : Float = titleObject.textWidth / 2 * titleObject.scaleX * 1.2;
+            decorations.lineStyle(1, 0xFFFFFF);
+            decorations.moveTo(-lineHalfWidth, 0);
+            decorations.lineTo(lineHalfWidth, 0);
+        }
 
         #if debug
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,23 +74,29 @@ class Menu extends h2d.Object {
         super.onAdd();
 
         // ensures we draw this when we add / remove the menu
-        drawBackground();
+        drawsGraphics();
 
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // PRIVATE FUNCTIONS
+
     /**
-     * draws the backgroudn overlay that fades out the game so the menu stands out more.
+     * draws the h2d.graphics overlay that fades out the game so the menu stands out more.
      */
-    private function drawBackground() {
+    private function drawsGraphics() {
+
+        // draws the background
         background.clear();
         background.beginFill(settings.Game.BACKGROUND_COLOR, settings.Menu.BACKGROUND_OVERLAY_OPACITY);
         background.drawRect(0, 0, width, height);
         background.endFill();
+
+        // draws the title decoration if exists.
+        if (title != null) {
+
+        }
     }
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // PRIVATE FUNCTIONS
     
     /**
      * internal function that calculates the placement for all the menu
@@ -78,11 +105,24 @@ class Menu extends h2d.Object {
     private function arrangeItems() {
 
         var oy = 0;
+
+        // places all the items
         for (i in 0 ... items.length) {
             items[i].x = width / 2;
             items[i].y = height / 2 - overallHeight/2 + oy + items[i].height/2;
+            oy += items[i].height + itemPadding;
+        }
 
-            oy = items[i].height + itemPadding;
+        // places the title so it is right above the first element.
+        if (title != null) {
+            title.x = items[0].x;
+            title.y = (items[0].y - items[0].height / 2) - settings.Menu.TITLE_SPACING;
+
+            // if we have a description we need to move the title up
+            // to account for that.
+            if (description != null) {
+                title.y -= description.textHeight * description.scaleY;
+            }
         }
 
         #if debug
@@ -164,7 +204,22 @@ class Menu extends h2d.Object {
 		if (Controls.is("up", keycode)) previousItem();
 		if (Controls.is("down", keycode)) nextItem();
 
-		//if (Controls.is("left", keycode)) if (movingDirection == Up || direction == Down) direction = Left;
-		//if (Controls.is("right", keycode)) if (movingDirection == Up || direction == Down) direction = Right;
+		if (Controls.is("left", keycode)) items[selectedItem].moveChoice(-1);
+		if (Controls.is("right", keycode)) items[selectedItem].moveChoice(1);
+    }
+
+    public function setDescription(descriptionText : String) {
+        // check since we are going to add this description object to the title object
+        // so it must be created.
+        if (title == null) throw("can't add a drescription to a menu is there isn't a title");
+
+        if (description == null) {
+            description = new h2d.Text(hxd.res.DefaultFont.get(), title);
+            description.maxWidth = width * settings.Menu.DESCRIPTION_MAX_WIDTH_MOD;
+            description.textAlign = Center;
+            description.x = -description.maxWidth/2;
+        } 
+
+        description.text = descriptionText;
     }
 }

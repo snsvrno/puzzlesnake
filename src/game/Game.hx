@@ -18,6 +18,22 @@ class Game extends core.Window {
 		instance.start();
 	}
 
+	/**
+	 * reloads the game and restarts it, but doesn't 
+	 * remove menus and goes through the complete
+	 * starting process
+	 * 
+	 * does reset the score and the current player game
+	 * progress
+	 * 
+	 * mainly used for changing settings before playing
+	 * that instance so that the changes are reflected
+	 * in the demo background
+	 */
+	static public function hotReload() {
+		instance.start();
+	}
+
 	static public function setMenu(menu : menu.Menu) {
 
 		// remove the current menu from the display.
@@ -88,8 +104,8 @@ class Game extends core.Window {
 	private var player : obj.Player;
 
 	/*** all the specific gamplay options */
-	private var options : structures.GameplayOptions;
-	private var pause : Bool = false;
+	public var options : structures.GameplayOptions;
+	public var pause : Bool = false;
 
 	////////////////////////////////////////////////////////////////////
 

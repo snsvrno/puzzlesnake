@@ -8,6 +8,12 @@ class Menu {
     /*** background opactiy for blending / hiding the game */
     inline static public var BACKGROUND_OVERLAY_OPACITY : Float = 0.5;
 
+    /*** how much space between the items and the title. */
+    inline static public var TITLE_SPACING : Int = 10;
+
+    /*** description max width modifier, should be between 0 and 1. */
+    inline static public var DESCRIPTION_MAX_WIDTH_MOD : Float = 0.95;
+
     ///////////////////////////////////////////////////////////////
     // DEBUG SETTINGS
 
