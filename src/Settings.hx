@@ -8,6 +8,8 @@ class Settings {
 		else return instance.foodColors[position];
 	}
 
+	static public function getFoodColors() : Array<Int> return instance.foodColors.copy();
+
 	/**
 	 * creates a new settings, attempts to load it from the save, and if it doesn't
 	 * exist then uses the default stuff.

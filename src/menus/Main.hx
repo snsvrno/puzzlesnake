@@ -6,7 +6,12 @@ function main(width : Int, height : Int) : menu.Menu {
 
     // START GAME
     // initalizes a new game erasing all progress
-    var play = new menu.Item("Start Game!");
+    /*var play = new menu.BaseItem("Start Game!");
+    play.onPress = function() {
+        game.Game.newGame();
+    }
+    menu.addItem(play);*/
+    var play = new menu.components.Choice("Start Game!");
     play.onPress = function() {
         game.Game.newGame();
     }
@@ -18,7 +23,12 @@ function main(width : Int, height : Int) : menu.Menu {
 
     // GAME OPTIONS
     // where the player can change difficulty settings
-    var gameOptions = new menu.Item("Game Options");
+    /*var gameOptions = new menu.BaseItem("Game Options");
+    gameOptions.onPress = function() {
+        // adds the menu to the stack.
+        game.Game.setMenu(menus.GameOptions.gameOptions(width, height));
+    }*/
+    var gameOptions = new menu.components.Choice("Options");
     gameOptions.onPress = function() {
         // adds the menu to the stack.
         game.Game.setMenu(menus.GameOptions.gameOptions(width, height));
