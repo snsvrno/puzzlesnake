@@ -1,0 +1,25 @@
+{
+  "skipTerminateQuickPick": true,
+  "skipSwitchToOutput": false,
+  "skipErrorMessage": true,
+  "commands": [
+    {
+      "text": "🗳 Package All",
+      "color": "pink",
+      "commandType":"palette",
+      "command": "workbench.action.tasks.runTask|Package",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 5
+    },
+    {
+      "text": "🌰 Archive Version",
+      "color": "lightspurple",
+      "commandType":"palette",
+      "command": "workbench.action.tasks.runTask|Versions",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 5
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "RedistHelper",
+            "type": "shell",
+            "command": "haxelib run redistHelper hxml/hl.sdl.hxml hxml/js.hxml -o rel -zip",
+            "group": "build",
+        },
+        {
+            "label": "Versions",
+            "type": "shell",
+            "command": "bash scripts/versions.sh",
+            "group": "build",
+        },
+        {
+            "label": "Package",
+            "dependsOn" : ["RedistHelper"],
+            "dependsOrder": "sequence"
+        }
+    ]
+}

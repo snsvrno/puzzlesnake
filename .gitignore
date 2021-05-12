@@ -1,10 +1,11 @@
 # workspace stuff
-.vscode
 *.code-workspace
 /*.hxml
 
 # compiled stuffs
 bin
+rel
+rel.archive
 
 # haxelib stuff
 .haxelib

@@ -260,7 +260,11 @@ class Game extends core.Window {
 			// checks if we got the requesits for wall.
 			if (makeAWall()) {
 
+				#if debug
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				log('making a wall');
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				#end
 
 				// we need to remove the tail segments, convert them
 				// to walls and keep them in place.
