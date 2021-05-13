@@ -6,11 +6,6 @@ function main(width : Int, height : Int) : menu.Menu {
 
     // START GAME
     // initalizes a new game erasing all progress
-    /*var play = new menu.BaseItem("Start Game!");
-    play.onPress = function() {
-        game.Game.newGame();
-    }
-    menu.addItem(play);*/
     var play = new menu.components.Choice("Start Game!");
     play.onPress = function() {
         game.Game.newGame();
@@ -20,20 +15,24 @@ function main(width : Int, height : Int) : menu.Menu {
     // CONTINUE GAME
     // will only show if the player is currently in a game, will
     // continue the existing game.
-
-    // GAME OPTIONS
-    // where the player can change difficulty settings
-    /*var gameOptions = new menu.BaseItem("Game Options");
-    gameOptions.onPress = function() {
-        // adds the menu to the stack.
-        game.Game.setMenu(menus.GameOptions.gameOptions(width, height));
-    }*/
-    var gameOptions = new menu.components.Choice("Options");
+    
+    var gameOptions = new menu.components.Choice("Game Options");
     gameOptions.onPress = function() {
         // adds the menu to the stack.
         game.Game.setMenu(menus.GameOptions.gameOptions(width, height));
     }
     menu.addItem(gameOptions);
+    
+    var visualOptions = new menu.components.Choice("Visual Options");
+    visualOptions.onPress = function() {
+        // adds the menu to the stack.
+        game.Game.setMenu(menus.VisualOptions.visualOptions(width, height));
+    }
+    menu.addItem(visualOptions);
+
+    var exit = new menu.components.Choice("Quit");
+    exit.onPress = () -> game.Game.instance.quit();
+    menu.addItem(exit);
 
     // selects the first item.
     menu.selectItem();

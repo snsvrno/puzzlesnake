@@ -171,6 +171,14 @@ class Game extends core.Window {
 	}
 
 	/**
+	 * called when we want to quit the game.
+	 * do some kind of cleanup logic here
+	 */
+	public function quit() {
+		hxd.System.exit();
+	}
+
+	/**
 	 * configures the game for a new play session (a new game)
 	 */
 	private function start() {

@@ -62,14 +62,15 @@ class Window extends hxd.App {
 		// setup the crt shader
 		crt = new shaders.CRT();
 		crtFilter = new h2d.filter.Shader(crt);
-		//filterEffects.add(crtFilter);
+		filterEffects.add(crtFilter);
+		crtFilter.enable = false;
 
 		// setting up the bubble shader.
 		bubble = new shaders.Bubble();
 		bubbleFilter = new h2d.filter.Shader(bubble);
 		// set the background fill color so there isn't any 'black'
 		bubble.backgroundColor.setColor(settings.Game.BACKGROUND_COLOR);
-		//filterEffects.add(bubbleFilter);
+		filterEffects.add(bubbleFilter);
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -118,4 +119,16 @@ class Window extends hxd.App {
 	}
 
 	//////////////////////////////////////////////////////////////////
+
+	public function bubbleShaderEnabled() : Bool return bubbleFilter.enable;
+	public function toggleBubbleShader(?state : Bool) : Bool { 
+		if (state != null) return bubbleFilter.enable = state;
+		else return bubbleFilter.enable = !bubbleFilter.enable;
+	}
+
+	public function crtShaderEnabled() : Bool return crtFilter.enable;
+	public function toggleCrtShader(?state : Bool) : Bool { 
+		if (state != null) return crtFilter.enable = state;
+		else return crtFilter.enable = !crtFilter.enable;
+	}
 }
