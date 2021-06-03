@@ -363,6 +363,13 @@ class Game extends core.Window {
 		// check if the console is open, and if it is then we
 		// ignore all event processing.
 		if (console.isActive()) return;
+
+		// toggle fullscreen with a button. (F12)
+		if (e.kind == EKeyDown && e.keyCode == hxd.Key.F12) {
+			var window = hxd.Window.getInstance();
+			if (window.displayMode == Borderless) window.displayMode = Windowed;
+			else window.displayMode = Borderless;
+		}
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#end
 

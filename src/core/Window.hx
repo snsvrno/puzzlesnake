@@ -1,5 +1,7 @@
 package core;
 
+import h3d.shader.Texture;
+
 /**
  * Contains all the higher level functions that aren't game specific
  * but should be handled by each game.
@@ -63,7 +65,6 @@ class Window extends hxd.App {
 		crt = new shaders.CRT();
 		crtFilter = new h2d.filter.Shader(crt);
 		filterEffects.add(crtFilter);
-		crtFilter.enable = false;
 
 		// setting up the bubble shader.
 		bubble = new shaders.Bubble();
@@ -71,6 +72,9 @@ class Window extends hxd.App {
 		// set the background fill color so there isn't any 'black'
 		bubble.backgroundColor.setColor(settings.Game.BACKGROUND_COLOR);
 		filterEffects.add(bubbleFilter);
+
+		bubbleFilter.enable = false;
+		crtFilter.enable = false;
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -91,7 +95,7 @@ class Window extends hxd.App {
 		// always available.
 		width = window.width;
 		height = window.height;
-
+		
 		// adjust the scale of the game world object.
 		// calculates the zoom for the x and y direction based on the zoom
 		// settings
@@ -101,7 +105,7 @@ class Window extends hxd.App {
 		// calculates the new scale
 		// we are going to round it to a factor of 2 so that it comes out nice
 		// when it is displayed on the screen.
-		var chosenScale = { 
+		var chosenScale = {
 			var perfectScale = Math.min(scalex, scaley); 
 			
 			// using 2 decimal places.
@@ -129,10 +133,7 @@ class Window extends hxd.App {
 		backgroundFill.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		backgroundFill.endFill();
 
-		// stuff that we need to send the shaders so they do their stuff correctly.
-		// we send the height and width so it knows the correct size to make the pixels.
 		crt.screenWidth = width;
-		crt.screenHeight = height;
 	}
 
 	//////////////////////////////////////////////////////////////////
