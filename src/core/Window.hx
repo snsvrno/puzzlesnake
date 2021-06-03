@@ -1,7 +1,5 @@
 package core;
 
-import h3d.shader.Texture;
-
 /**
  * Contains all the higher level functions that aren't game specific
  * but should be handled by each game.
@@ -59,7 +57,7 @@ class Window extends hxd.App {
 		// the container for all the effecs.
 		filterEffects = new h2d.filter.Group();
 		// applying it to the world
-		world.filter = filterEffects;
+		s2d.filter = filterEffects;
 
 		// setup the crt shader
 		crt = new shaders.CRT();
@@ -74,7 +72,7 @@ class Window extends hxd.App {
 		filterEffects.add(bubbleFilter);
 
 		bubbleFilter.enable = false;
-		crtFilter.enable = false;
+		crtFilter.enable = true;
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -134,6 +132,7 @@ class Window extends hxd.App {
 		backgroundFill.endFill();
 
 		crt.screenWidth = width;
+		crt.screenHeight = height;
 	}
 
 	//////////////////////////////////////////////////////////////////
