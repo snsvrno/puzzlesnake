@@ -97,8 +97,25 @@ class Window extends hxd.App {
 		// settings
 		var scalex = (window.width - viewportPadding.left - viewportPadding.right) / (viewportWidth);
 		var scaley = (window.height - viewportPadding.top - viewportPadding.bottom) / (viewportHeight);
+
+		// calculates the new scale
+		// we are going to round it to a factor of 2 so that it comes out nice
+		// when it is displayed on the screen.
+		var chosenScale = { 
+			var perfectScale = Math.min(scalex, scaley); 
+			
+			// using 2 decimal places.
+			var newScale = perfectScale * 100;
+			newScale = Math.round(newScale);
+
+			// if we are odd then we add 1.
+			if (newScale % 2 == 1) newScale += 1;
+
+			// returning it to the decimal places used above.
+			newScale / 100;
+		};
 		// sets the min to the layer.
-		world.setScale(Math.min(scalex, scaley));
+		world.setScale(chosenScale);
 		// moves the position so that the world is centered.
 		// this doesn't move to the center of the world (0,0 aligned to center) because i started it
 		// with 0,0 being top left and then added ui in the negative relm ... not sure why that was a
