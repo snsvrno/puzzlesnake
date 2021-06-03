@@ -37,7 +37,8 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     confirmation.addChoice("Cancel", function() {
         // we should revert everything back to the original options
         bubbleShader.reset();
-
+        crtShader.reset();
+        fullScreen.reset();
         // go back
         game.Game.shiftMenu();
     });
