@@ -57,6 +57,7 @@ class Toggle extends Item {
 
     override public function setSelected() outline.color = settings.MenuItem.OUTLINE_OVER_COLOR;
     override public function setUnSelected() outline.color = settings.MenuItem.OUTLINE_COLOR;
+    override public function moveChoice(_ : Int) activate();
 
     private function setStateText() {
         if (state) stateText.text = "Enabled";
