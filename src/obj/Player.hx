@@ -88,10 +88,10 @@ class Player extends GridObject {
 
 	public function keypressed(keycode : Int) {
 		
-		if (Controls.is("up", keycode)) if (movingDirection == Left || direction == Right) direction = Up;
-		if (Controls.is("down", keycode)) if (movingDirection == Left || direction == Right) direction = Down;
-		if (Controls.is("left", keycode)) if (movingDirection == Up || direction == Down) direction = Left;
-		if (Controls.is("right", keycode)) if (movingDirection == Up || direction == Down) direction = Right;
+		if (Controls.is("up", keycode)) if (movingDirection == Left || movingDirection == Right) direction = Up;
+		if (Controls.is("down", keycode)) if (movingDirection == Left || movingDirection == Right) direction = Down;
+		if (Controls.is("left", keycode)) if (movingDirection == Up || movingDirection == Down) direction = Left;
+		if (Controls.is("right", keycode)) if (movingDirection == Up || movingDirection == Down) direction = Right;
 
 	}
 
