@@ -61,9 +61,11 @@ class Menu extends h2d.Object {
         items.push(item);
         flex.addChild(item);
 
-        // update the position of the entire flex\
-        flex.x = width / 2 - flex.outerWidth / 2;
-        flex.y = height / 2 - flex.outerHeight / 2;
+        // update the position of the entire flex
+        // * adds the `Math.floor` because we were getting weird pixel drawing
+        //   issues where it would be distorted because it was drawing on sub-pixels.
+        flex.x = Math.floor(width / 2 - flex.outerWidth / 2);
+        flex.y = Math.floor(height / 2 - flex.outerHeight / 2);
     }
 
     public function selectItem(?pos : Int = 0) {
