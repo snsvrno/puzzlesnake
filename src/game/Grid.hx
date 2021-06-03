@@ -64,7 +64,7 @@ class Grid extends h2d.Object {
 	}
 
 	public function getTile(gx : Int, gy : Int) : Null<obj.Tile> {
-		if (gx < 0 || gx > width-1 || gy < 0 || gy > height - 1) return null;
+		if (gx < 0 || gx > width - 1 || gy < 0 || gy > height - 1) return null;
 		else return cells[gx][gy];
 	}
 
@@ -122,6 +122,6 @@ class Grid extends h2d.Object {
 	}
 
 	public function isEdge(gx : Int, gy : Int) : Bool {
-		return gx == 0 || gy == 0 || gx == width || gy == height;
+		return gx == 0 || gy == 0 || gx == width - 1 || gy == height - 1;
 	}
 }

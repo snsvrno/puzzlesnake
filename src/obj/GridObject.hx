@@ -47,4 +47,5 @@ class GridObject extends h2d.Graphics {
 
 	// public function tick() : Bool { return true; }
 	public function getColor() : Int return fillColor;
+	public function getOutlineColor() : Int return outlineColor;
 }

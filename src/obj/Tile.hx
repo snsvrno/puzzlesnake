@@ -16,19 +16,19 @@ class Tile extends h2d.Graphics {
 		drawRect(-settings.Grid.SIZE/2,-settings.Grid.SIZE/2,settings.Grid.SIZE,settings.Grid.SIZE);
 
 		for (direction => color in blockings) {
-			lineStyle(settings.Grid.LINESIZE, color);
+			lineStyle(settings.Grid.LINESIZE, color, settings.Grid.COLOR);
 			switch(direction) {
 				case Up: 
-					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
-					lineTo(settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
+					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2 + settings.Grid.LINESIZE);
+					lineTo(settings.Grid.SIZE/2, -settings.Grid.SIZE/2 + settings.Grid.LINESIZE);
 
 				case Down:
 					moveTo(-settings.Grid.SIZE/2, settings.Grid.SIZE/2);
 					lineTo(settings.Grid.SIZE/2, settings.Grid.SIZE/2);
 					
 				case Left:
-					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
-					lineTo(-settings.Grid.SIZE/2, settings.Grid.SIZE/2);
+					moveTo(-settings.Grid.SIZE/2 + settings.Grid.LINESIZE, -settings.Grid.SIZE/2 );
+					lineTo(-settings.Grid.SIZE/2 + settings.Grid.LINESIZE, settings.Grid.SIZE/2);
 
 				case Right:
 					moveTo(settings.Grid.SIZE/2, -settings.Grid.SIZE/2);
@@ -38,7 +38,9 @@ class Tile extends h2d.Graphics {
 	}
 
 	public function clearBlocking() {
-		for (d in blockings.keys()) blockings.remove(d);
+		var cleared : Bool = false;
+		for (d in blockings.keys()) if (blockings.remove(d) && !cleared) cleared = true;
+		if (cleared) updateGraphics();
 	}
 
 	public function setBlocking(direction : Player.Direction, color : Int) {

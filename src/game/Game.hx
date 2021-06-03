@@ -419,16 +419,13 @@ class Game extends core.Window {
 	private function updateEdgeGrid() {
 		
 		for (w in walls) {
-			
-			// is an edge piece.
 			if (grid.isEdge(w.gx, w.gy)) {
-				if (w.gx == 0) grid.getTile(grid.width-1, w.gy).setBlocking(Right, w.getColor());
-				else grid.getTile(0, w.gy).setBlocking(Left, w.getColor());
+				if (w.gx == 0) grid.getTile(grid.width - 1, w.gy).setBlocking(Right, w.getOutlineColor());
+				else if (w.gx == grid.width-1) grid.getTile(0, w.gy).setBlocking(Left, w.getOutlineColor());
 
-				if (w.gy == 0) grid.getTile(w.gx, grid.height-1).setBlocking(Down, w.getColor());
-				else grid.getTile(w.gx, 0).setBlocking(Up, w.getColor());
+				if (w.gy == 0) grid.getTile(w.gx, grid.height - 1).setBlocking(Down, w.getOutlineColor());
+				else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).setBlocking(Up, w.getOutlineColor());
 			}
-
 		}
 	}
 
