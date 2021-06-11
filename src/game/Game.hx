@@ -132,6 +132,7 @@ class Game extends core.Window {
 			tickMakeWall: 1.15,
 			tickEatFood: 0.95,
 			foodLimit: 3,
+			tickMovement: 0.9999,
 		};
 
 		clock = new Clock(options.startingTickSpeed);
@@ -244,6 +245,9 @@ class Game extends core.Window {
 		var gridPosition = grid.getScreenPosition(playerPosition.gx, playerPosition.gy);
 		if (gridPosition == null) gameOver(); 
 		else player.setGridPosition(gridPosition);
+
+		// does some basic time incrementation
+		clock.length *= options.tickMovement;
 		
 		// checks for game over collisions
 		if (player.collides(tails)) gameOver();

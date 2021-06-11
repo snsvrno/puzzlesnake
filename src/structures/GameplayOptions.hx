@@ -18,4 +18,7 @@ typedef GameplayOptions = {
 
 	/*** how many foods should be on the board at once. */
 	foodLimit : Int,
+
+	/*** modifier just for moving */
+	tickMovement : Float,
 };
