@@ -1,9 +1,14 @@
 package obj;
 
+enum FoodType {
+	Food; Steroid;
+}
+
 class Food extends GridObject {
 
 	public var variant : Int;
 	public var value : Int = 1;
+	public var foodType : FoodType = Food;
 
 	public function new(?variantupperlimit : Int, ?parent : h2d.Object) {
 		super(parent);

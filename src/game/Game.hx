@@ -86,22 +86,26 @@ class Game extends core.Window {
 	public var menu : Array<menu.Menu> = [];
 
 	// organizational objects
-	private var foods : Array<obj.Food> = [];
+	private var foods : obj.Container<obj.Food>;
+	// private var foods : Array<obj.Food> = [];
 	private var tails : Array<obj.Tail> = [];
-	private var walls : Array<obj.Tail> = [];
+	//private var walls : Array<obj.Tail> = [];
+	private var walls : obj.Container<obj.Wall>;
 
 	// layers that contain all the sprites / display objects for the game.
 	// doing this route so I can manage draw order and easily show / hide
 	// different types of stuff.
 	private var playerLayer : h2d.Object;
-	private var wallsLayer : h2d.Object;
-	private var foodLayer : h2d.Object;
+	//private var wallsLayer : h2d.Object;
+	// private var foodLayer : h2d.Object;
 	// private var uiLayer : h2d.Object;
 
 	// trackers and variables
 	/*** how many foods should exist. */
 	private var tailQueue : Array<obj.Food> = [];
 	private var player : obj.Player;
+	/*** tracks when we should make a new steroid */
+	private var steroidGenTracker : Int;
 
 	/*** all the specific gamplay options */
 	public var options : structures.GameplayOptions;
@@ -132,8 +136,10 @@ class Game extends core.Window {
 
 		clock = new Clock(options.startingTickSpeed);
 
-		foodLayer = new h2d.Object(world);
-		wallsLayer = new h2d.Object(world);
+		foods = new obj.Container(world);
+		walls = new obj.Container(world);
+		// foodLayer = new h2d.Object(world);
+		// wallsLayer = new h2d.Object(world);
 		playerLayer = new h2d.Object(world);
 		grid = new game.Grid(settings.Game.GRID_WIDTH, settings.Game.GRID_HEIGHT, world);
 
@@ -196,7 +202,7 @@ class Game extends core.Window {
 		/////////////////////////////////////////
 		// FOOD STUFFS
 		// removes the old food
-		while (foods.length > 0) foods.pop().remove();
+		while (foods.length > 0) foods.pop();
 		// makes some new food
 		makeFood();
 
@@ -224,6 +230,11 @@ class Game extends core.Window {
 	private function tick() {
 
 		/////////////////////////////////////////
+		// UPDATE ALL OBJECTS
+		// tells all the objects that a tick has passed
+		obj.GridObject.runAllTicks();
+
+		/////////////////////////////////////////
 		// PLAYER MOVEMENT THINGS
 		// first we track the current player position for the tails
 		var lastx = player.gx;
@@ -233,9 +244,10 @@ class Game extends core.Window {
 		var gridPosition = grid.getScreenPosition(playerPosition.gx, playerPosition.gy);
 		if (gridPosition == null) gameOver(); 
 		else player.setGridPosition(gridPosition);
+		
 		// checks for game over collisions
 		if (player.collides(tails)) gameOver();
-		if (player.collides(walls)) gameOver();
+		if (player.collides(walls.iter(), checkCollisionsIfEatableWall)) gameOver();
 
 		////////////////////////////////////////////
 		// UPDATES TAIL POSITIONS
@@ -278,10 +290,12 @@ class Game extends core.Window {
 				// to walls and keep them in place.
 				for (_ in 0 ... settings.Game.WALL_BUILD_LENGTH) {
 					var segment = tails.pop();
-					segment.setWall();
-					// playerLayer.removeChild(segment);
-					wallsLayer.addChild(segment);
-					walls.push(segment);
+
+					var wall = new obj.Wall(segment.variant);
+					wall.setGridPosition(segment.getGridPosition());
+
+					playerLayer.removeChild(segment);
+					walls.addObj(wall);
 				}
 
 				// update the edge grid so we can see walls that 
@@ -301,22 +315,49 @@ class Game extends core.Window {
 
 		/////////////////////////////////////////
 		// CHECKS ON THE EATING!
-		for (f in foods) {
+
+		// did we eat a food.
+		for (f in foods.iter()) {
 			if (f.gx == player.gx && f.gy == player.gy) {
 				eatFood(f);
+				
+				// we update the steroid tracker, because we create a steroid
+				// ever XX foods.
+				steroidGenTracker += 1;
+			}
+		}
+
+		// did we eat a wall??
+		for (w in walls.iter()) {
+			if (w.gx == player.gx && w.gy == player.gy) {
+				eatWall(w);
+				
+				// we update the steroid tracker, because we create a steroid
+				// ever XX foods.
+				steroidGenTracker += 1;
 			}
 		}
 
 		///////////////////////////////////////////
 		// REPOPULATES FOOD.
-		makeFood();
+		if (steroidGenTracker >= settings.Game.STEROID_COUNTER) {
+			steroidGenTracker = 0;
+			makeSteroid();
+		} 
 
+		makeFood();
 	}
 
 	/**
 	 * eats the food and does whatever else needs to be done.
 	 */
 	private function eatFood(f : obj.Food) {
+
+		// first checks if this is actually a steroid.
+		if (f.foodType == Steroid) {
+			eatSteroid(cast(f, obj.Steroid));
+			return;
+		}
 
 		#if debug
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,8 +366,7 @@ class Game extends core.Window {
 		#end
 
 		// removes the food from the world
-		foods.remove(f);
-		f.remove();
+		foods.removeObj(f);
 
 		// adds the food to the player
 		tailQueue.push(f);
@@ -338,12 +378,43 @@ class Game extends core.Window {
 		ui.updateScore(ui.getFood(f.variant).value * f.value);
 	}
 
+	private function eatSteroid(s : obj.Steroid) {
+		
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		log('ate steroid ${s.variant} at ${s.gx}, ${s.gy}');
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#end
+
+		// goes through the walls and sets them to eatable.
+		for (w in walls.iter()) {
+			if (w.variant == s.variant) w.setEatable();
+		}
+	}
+
+	private function eatWall(w : obj.Wall) {
+
+
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		log('ate wall ${w.variant} at ${w.gx}, ${w.gy}');
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#end
+
+		walls.removeObj(w);
+		
+		// updates the score.
+		ui.updateScore(ui.getFood(w.variant).value * w.value);
+	}
+
 	override function update(dt:Float) {
 		super.update(dt);
 
 		if (pause) return;
 
 		if (clock.update(dt)) tick();
+
+		obj.GridObject.runAppUpdates(dt);
 	}
 
 	override function onEvent(e : hxd.Event) {
@@ -401,14 +472,51 @@ class Game extends core.Window {
 
 	////////////////////////////////////////////////////////////////////
 
-	
+	/**
+	 * makes food for the player to eat.
+	 */
 	private function makeFood() {
 		while (foods.length < options.foodLimit) {
-			var position = grid.getRandomPosition([[player], cast(foods, Array<Dynamic>), tails, walls]);
-			var f = new obj.Food(options.colors, foodLayer);
+			var position = grid.getRandomPosition([[player], cast(foods.iter(), Array<Dynamic>), tails, walls.iter()]);
+
+			var f = new obj.Food(options.colors);
 			f.setGridPosition(position);
-			foods.push(f);
+			foods.addObj(f);
+
+			if (console != null) console.log('making food ${f.variant} at ${position.gx}, ${position.gy}');
 		}
+	}
+
+	/**
+	 * makes a special kind of food that allows the player to eat walls.
+	 */
+	private function makeSteroid() {
+		if (foods.length < options.foodLimit) {
+			var position = grid.getRandomPosition([[player], cast(foods.iter(), Array<Dynamic>), tails, walls.iter()]);
+
+			// gets a random color of a wall that exists.
+			var color = {
+				var colors : Array<Int> = [];
+				for (w in walls.iter()) {
+					var c = w.variant;
+					if (!colors.contains(c)) colors.push(c);
+				}
+
+				if (colors.length == 0) {
+					console.log('can\'t make a steroid..');
+					return;
+				}
+
+				var i = Math.floor(Math.random() * colors.length);
+				colors[i];
+			};
+
+			var s = new obj.Steroid(color);
+			s.setGridPosition(position);
+			foods.addObj(s);
+
+			if (console != null) console.log('making steroid.');
+		} 
 	}
 
 	/**
@@ -418,7 +526,7 @@ class Game extends core.Window {
 	 */
 	private function updateEdgeGrid() {
 		
-		for (w in walls) {
+		for (w in walls.iter()) {
 			if (grid.isEdge(w.gx, w.gy)) {
 				if (w.gx == 0) grid.getTile(grid.width - 1, w.gy).setBlocking(Right, w.getOutlineColor());
 				else if (w.gx == grid.width-1) grid.getTile(0, w.gy).setBlocking(Left, w.getOutlineColor());
@@ -427,6 +535,17 @@ class Game extends core.Window {
 				else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).setBlocking(Up, w.getOutlineColor());
 			}
 		}
+	}
+
+	/**
+	 * used to cancel the collision death event if the wall is eatable.
+	 * @param wall 
+	 * @return Bool
+	 */
+	private function checkCollisionsIfEatableWall(wall : Dynamic) : Bool {
+		var w = cast(wall, obj.Wall);
+		if (w.eatable) return true;
+		return false;
 	}
 
 	private function makeAWall() : Bool {
