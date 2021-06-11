@@ -12,16 +12,24 @@ class Food extends GridObject {
 
 	public function new(?variantupperlimit : Int, ?parent : h2d.Object) {
 		super(parent);
-		setVariant(variantupperlimit);
 		size = 6;
-
-		updateGraphics();
+		setVariantRandom(variantupperlimit);
 	}
 
-	public function setVariant(?upperlimit : Int) {
+	public function setVariantRandom(?upperlimit : Int) {
 		if (upperlimit == null) upperlimit = 6;
 
 		variant = Math.floor(Math.random()*upperlimit);
 		fillColor = Settings.getFoodColor(variant);
+
+		updateGraphics();
+	}
+
+	public function setVariant(variant : Int) {
+		
+		this.variant = variant;
+		fillColor = Settings.getFoodColor(variant);
+
+		updateGraphics();
 	}
 }

@@ -1,7 +1,5 @@
 package menus;
 
-import game.Game;
-
 function gameOptions(width : Int, height : Int) : menu.Menu {
     // testing for the menu
     var menu = new menu.Menu(width, height, "Game Options");

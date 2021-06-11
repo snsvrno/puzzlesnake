@@ -21,4 +21,10 @@ typedef GameplayOptions = {
 
 	/*** modifier just for moving */
 	tickMovement : Float,
+
+	/*** the weight of the players tails when generating food */
+	foodGenPlayerCut : Float,
+	
+	/***  the weight of the standard generation when generation food */
+	foodGenBaseCut : Float,
 };

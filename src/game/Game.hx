@@ -133,6 +133,8 @@ class Game extends core.Window {
 			tickEatFood: 0.95,
 			foodLimit: 3,
 			tickMovement: 0.9999,
+			foodGenBaseCut: 0.25,
+			foodGenPlayerCut: 0.75,
 		};
 
 		clock = new Clock(options.startingTickSpeed);
@@ -315,6 +317,10 @@ class Game extends core.Window {
 
 			// update your color to the tail color
 			if (tails.length > 0) player.setHeadColor(tails[tails.length-1].getColor());
+
+			// since we ate a food we should check if we need to populate more 
+			// food
+			makeFood();
 		}
 
 		/////////////////////////////////////////
@@ -348,8 +354,6 @@ class Game extends core.Window {
 			steroidGenTracker = 0;
 			makeSteroid();
 		} 
-
-		makeFood();
 	}
 
 	/**
@@ -484,6 +488,78 @@ class Game extends core.Window {
 			var position = grid.getRandomPosition([[player], cast(foods.iter(), Array<Dynamic>), tails, walls.iter()]);
 
 			var f = new obj.Food(options.colors);
+
+			///////////
+			// the random smart generation
+			// what we are trying to do is to check how many pieces are in the player, and weight colors that are closer
+			// to becoming walls first, so that hopefully the piece the player needs is spawned and the player can make
+			// a wall
+			var ranges : Array<Float> = [ ];
+
+			// the standard chance, this is equal across all colors.
+			var baseChance = 1 / options.colors;
+			// we check if we have any tail, if we don't have a tail then that means
+			// we will only be using the baseChance, so we weight it to 1.0.
+			var baseCut = if (tails.length == 0) 1.0; else { options.foodGenBaseCut; };
+			// we make the basic ranges using the baseChance.
+			for (_ in 0 ... options.colors) ranges.push(baseChance * baseCut);
+
+			if (tails.length > 0) {
+				// if we have tails then we need to count how many colors are in the tail
+				// and what position so we can weight them into the chances too.
+				
+				// what we need to divide these numbers by so they equate 1
+				// came up with this by running some examples of what i wanted
+				// in a spreadsheet.
+				var diviser = if(tails.length == 1) 1;
+				else 1 + 0.5 * (tails.length-1);
+
+				for (i in 0 ... options.colors) {
+					// we check each of the valid colors.
+
+					// determines what the probability count is, this isn't a straight
+					// count but instead something to scale it so all the tail "counts"
+					// will equal 1.
+					var count = 0.0;
+					for (ti in 0 ... tails.length) {
+
+						if (tails[ti].variant == i) {
+							// if this variant is the color we are looking for, then we count
+							// its weighted probability score, this is determined by its position
+							// in the tail `score = position / total length` so if it was 3rd and
+							// the tail length was 6 then it would be `3/6 == 0.5`
+							var positionalValue = (ti+1) / tails.length;
+
+							// we then add it to the total count for this color, and use the diviser.
+							// this normalizes the score so that when suming all the counts for all
+							// the colors it will equal 1.0
+							count += positionalValue / diviser;
+						}
+
+					}
+					// scales it per the player cut and adds it to the total range for that color.
+					ranges[i] += count * options.foodGenPlayerCut;
+				}
+			}
+
+			// now we actually makes the ranges so we can more easily check the random number with them
+			for (i in 1 ... ranges.length) ranges[i] += ranges[i-1];
+
+			trace(ranges);
+
+			// and now we spawn a random number and check it against the ranges.
+			var random = Math.random();
+			trace(random);
+			for (i in 0 ... ranges.length) {
+				if (i == 0) {
+					if (random <= ranges[i]) { trace(1,i); f.setVariant(i); break; }
+				} else {
+					if (ranges[i-1] <= random && random <= ranges[i]) { trace(2,i); f.setVariant(i); break; }
+				}
+			}
+
+			///////////
+
 			f.setGridPosition(position);
 			foods.addObj(f);
 
