@@ -9,3 +9,6 @@ rel.archive
 
 # haxelib stuff
 .haxelib
+
+# other files
+docs/
