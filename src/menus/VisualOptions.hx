@@ -17,6 +17,11 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     crtShader.onToggle = (state : Bool) -> game.Game.instance.toggleCrtShader(state);
     menu.addItem(crtShader);
 
+    var bloomShader = new menu.components.Toggle("Bloom Effect");
+    bloomShader.originalState = Game.instance.bloomShaderEnabled();
+    bloomShader.onToggle = (state : Bool) -> game.Game.instance.toggleBloomShader(state);
+    menu.addItem(bloomShader);
+
     var fullScreen = new menu.components.Toggle("Fullscreen");
     fullScreen.onToggle = function(state : Bool){ 
         var window = hxd.Window.getInstance();

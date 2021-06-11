@@ -17,6 +17,8 @@ class Window extends hxd.App {
 	// the color splitting shader that emulates LCD crystals
 	private var crt : shaders.CRT; // the actual shader
 	private var crtFilter : h2d.filter.Shader<shaders.CRT>;  // the screen filter object that contains the shader.
+	// a bleed color intense shader
+	private var bloomFilter : h2d.filter.Bloom;
 
 	/*** the current window width */
 	private var width : Int;
@@ -71,8 +73,13 @@ class Window extends hxd.App {
 		bubble.backgroundColor.setColor(settings.Game.BACKGROUND_COLOR);
 		filterEffects.add(bubbleFilter);
 
-		bubbleFilter.enable = false;
+		// setting up the bloom shader.
+		bloomFilter = new h2d.filter.Bloom(1,1,1,1.25,2);
+		filterEffects.add(bloomFilter);
+
+		bubbleFilter.enable = true;
 		crtFilter.enable = true;
+		bloomFilter.enable = true;
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -136,6 +143,12 @@ class Window extends hxd.App {
 	}
 
 	//////////////////////////////////////////////////////////////////
+
+	public function bloomShaderEnabled() : Bool return bloomFilter.enable;
+	public function toggleBloomShader(?state : Bool) : Bool {
+		if (state != null) return bloomFilter.enable = state;
+		else return bloomFilter.enable = !bloomFilter.enable;
+	}
 
 	public function bubbleShaderEnabled() : Bool return bubbleFilter.enable;
 	public function toggleBubbleShader(?state : Bool) : Bool { 
