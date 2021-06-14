@@ -1,21 +1,17 @@
 package menus;
 
 function gameOptions(width : Int, height : Int) : menu.Menu {
-    // testing for the menu
+    
     var menu = new menu.Menu(width, height, "Game Options");
     menu.setDescription("options to adjust the gameplay and difficulty (changes aren't made until a new game is started)");
-    
-    ////////////////////////////////
-    // number of food colors 
+
+    // the available colors from the settings.
     var colors = new menu.components.ColorItem("Colors");
-    colors.setColors(Settings.getFoodColors());
-    colors.setSelectedPosition(game.Game.instance.options.colors-1);
-    menu.addItem(colors);
 
     ////////////////////////////////
-    // the 'ok' or 'cancel' selection 
-    var confirmation = new menu.components.ChoiceItem();
-    confirmation.addChoice("Ok", function() {
+    // the OK & cancel functions that we have so we can call them in multiple places.
+
+    var okFunction = function() {
         // need to add 1 because we are going from `index` to `count`
         game.Game.instance.options.colors = colors.selected + 1;
 
@@ -28,11 +24,25 @@ function gameOptions(width : Int, height : Int) : menu.Menu {
         else game.Game.hotReload();
 
         game.Game.shiftMenu();
-    });
-    confirmation.addChoice("Cancel", function() {
+    };
+
+    var cancelFunction = function() {
         // don't save anything that we chanced, just go back.
         game.Game.shiftMenu();
-    });
+    };
+    
+    ////////////////////////////////
+    // number of food colors 
+    colors.setColors(Settings.getFoodColors());
+    colors.setSelectedPosition(game.Game.instance.options.colors-1);
+    colors.onPress = okFunction;
+    menu.addItem(colors);
+
+    ////////////////////////////////
+    // the 'ok' or 'cancel' selection 
+    var confirmation = new menu.components.ChoiceItem();
+    confirmation.addChoice("Ok", okFunction);
+    confirmation.addChoice("Cancel", cancelFunction);
     menu.addItem(confirmation);
 
     ////////////////////////////////

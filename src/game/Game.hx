@@ -545,16 +545,14 @@ class Game extends core.Window {
 			// now we actually makes the ranges so we can more easily check the random number with them
 			for (i in 1 ... ranges.length) ranges[i] += ranges[i-1];
 
-			trace(ranges);
-
 			// and now we spawn a random number and check it against the ranges.
 			var random = Math.random();
-			trace(random);
+
 			for (i in 0 ... ranges.length) {
 				if (i == 0) {
-					if (random <= ranges[i]) { trace(1,i); f.setVariant(i); break; }
+					if (random <= ranges[i]) { f.setVariant(i); break; }
 				} else {
-					if (ranges[i-1] <= random && random <= ranges[i]) { trace(2,i); f.setVariant(i); break; }
+					if (ranges[i-1] <= random && random <= ranges[i]) { f.setVariant(i); break; }
 				}
 			}
 
