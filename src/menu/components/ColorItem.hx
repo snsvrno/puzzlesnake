@@ -39,15 +39,23 @@ class ColorItem extends Item {
         flex.horizontalSpacing = 10;
 
         textObject = new h2d.Text(hxd.res.DefaultFont.get(), flex);
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
         textObject.text = text;
 
         // creates the outline filter.
-        outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, settings.MenuItem.OUTLINE_OVER_COLOR, 1);
+        outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, Settings.ui2Color, 1);
         filter = outline;
     }
 
-    override public function setSelected() outline.color = settings.MenuItem.OUTLINE_OVER_COLOR;
-    override public function setUnSelected() outline.color = settings.MenuItem.OUTLINE_COLOR;
+    override public function setSelected() { 
+        outline.color = Settings.uiSelectedColor;
+        textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+    }
+
+    override public function setUnSelected() { 
+        outline.color = Settings.ui2Color;
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+    }
 
     public function setSelectedPosition(?pos : Int) {
         if (pos != null) selected = pos;

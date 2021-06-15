@@ -12,12 +12,6 @@ class Game {
 	/** how many like-minded colors are required to build a wall? */
 	inline static public var WALL_BUILD_LENGTH : Int = 3;
 
-	//////// UI & GRAPHICS ////////////////////////////
-	/*** the game background color */
-	inline static public var BACKGROUND_COLOR : Int = 0x0f0d0e;
-	/*** the off-color color of the wall, usually the core color (or outline if eatable) */
-	inline static public var WALL_COLOR : Int = 0x222222;
-
 	//////// STERIOD GAMEPLAY SETTINGS  ////////////////////////////
 	/*** how often should we try and make a steroid, looking at foods eaten */
 	inline static public var STEROID_COUNTER : Int = 10;

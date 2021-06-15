@@ -37,12 +37,14 @@ class Toggle extends Item {
         flex.horizontalSpacing = settings.Menu.PADDING;
 
         textObject = new h2d.Text(hxd.res.DefaultFont.get(), flex);
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
         textObject.text = text;
 
         stateText = new h2d.Text(hxd.res.DefaultFont.get(), flex);
+        stateText.color = h3d.Vector.fromColor(Settings.ui1Color);
         setStateText();
 
-        outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, settings.MenuItem.OUTLINE_OVER_COLOR, 1);
+        outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, Settings.ui2Color, 1);
         textObject.filter = outline;
     }
 
@@ -55,8 +57,18 @@ class Toggle extends Item {
         setStateText();
     }
 
-    override public function setSelected() outline.color = settings.MenuItem.OUTLINE_OVER_COLOR;
-    override public function setUnSelected() outline.color = settings.MenuItem.OUTLINE_COLOR;
+    override public function setSelected() { 
+        outline.color = Settings.uiSelectedColor;
+        textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        stateText.color = h3d.Vector.fromColor(Settings.uiSelectedColor);
+    }
+
+    override public function setUnSelected() { 
+        outline.color = Settings.ui2Color;
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+        stateText.color = h3d.Vector.fromColor(Settings.ui1Color);
+    }
+
     override public function moveChoice(_ : Int) activate();
 
     private function setStateText() {

@@ -13,6 +13,7 @@ class Score extends h2d.Object {
     public function new(parent : h2d.Object) {
         super(parent);
         textObject = new h2d.Text(hxd.res.DefaultFont.get(), this);
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
         updateDisplay();
     }
 

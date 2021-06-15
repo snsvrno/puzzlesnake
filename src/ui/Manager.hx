@@ -23,8 +23,8 @@ class Manager extends h2d.Object {
     private function drawBackground() {
         background.clear();
         
-        background.lineStyle(settings.Ui.BORDER_SIZE, settings.Ui.BORDER_COLOR);
-        background.beginFill(settings.Ui.BACKGROUND_COLOR);
+        background.lineStyle(settings.Ui.BORDER_SIZE, Settings.ui2Color);
+        background.beginFill(Settings.ui2Color);
         background.drawRect(0,0,this.width,this.height);
         background.endFill();
     }

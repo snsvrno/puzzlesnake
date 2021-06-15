@@ -26,6 +26,7 @@ class Food extends h2d.Graphics {
         // sets up the text.
         textValue = new h2d.Text(hxd.res.DefaultFont.get(), this);
         updateValue();
+        textValue.color = h3d.Vector.fromColor(Settings.ui1Color);
         textValue.x = settings.Ui.FOOD_SIZE/2 + 2;
         textValue.y = -textValue.textHeight/2 - 1;
     }

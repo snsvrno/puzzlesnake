@@ -27,10 +27,11 @@ class Menu extends h2d.Object {
 
         if (title != null) {
             var titleObject = new h2d.Text(hxd.res.DefaultFont.get(), flex);
+            titleObject.color = h3d.Vector.fromColor(Settings.ui1Color);
             titleObject.text = title;
 
             var spacer = new h2d.Graphics(flex);
-            spacer.lineStyle(1,0xFFFFFF);
+            spacer.lineStyle(1,Settings.ui1Color);
             spacer.moveTo(-100,0);
             spacer.lineTo(100,0);
         }
@@ -47,7 +48,7 @@ class Menu extends h2d.Object {
 
         // draws the background
         background.clear();
-        background.beginFill(settings.Game.BACKGROUND_COLOR, settings.Menu.BACKGROUND_OVERLAY_OPACITY);
+        background.beginFill(Settings.backgroundColor, settings.Menu.BACKGROUND_OVERLAY_OPACITY);
         background.drawRect(0, 0, width, height);
         background.endFill();
     }

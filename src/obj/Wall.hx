@@ -20,7 +20,7 @@ class Wall extends GridObject {
         this.variant = variant;
         outlineColor = originalColor = Settings.getFoodColor(variant);
 
-        fillColor = settings.Game.WALL_COLOR;
+        fillColor = Settings.wallColor;
         outlineSize = 4;
 
 		updateGraphics();
@@ -29,7 +29,7 @@ class Wall extends GridObject {
     public function setEatable() {
         eatable = true;
         countdown = settings.Game.STEROID_LASTING_TIME;
-        outlineColor = settings.Game.WALL_COLOR;
+        outlineColor = Settings.wallColor;
         fillColor = originalColor;
         sinB = Math.floor(settings.Game.STEROID_LASTING_TIME / 2);
 
@@ -44,7 +44,7 @@ class Wall extends GridObject {
             if (countdown <= 0) {
                 eatable = false;
                 outlineColor = originalColor;
-                fillColor = settings.Game.WALL_COLOR;
+                fillColor = Settings.wallColor;
 		        updateGraphics();
                 return;
             }
@@ -63,7 +63,7 @@ class Wall extends GridObject {
                 
                 // update the color. if we are going to blink
                 if (blinkFrame) outlineColor = 0x888888;
-                else outlineColor = settings.Game.WALL_COLOR;
+                else outlineColor = Settings.wallColor;
                 blinkFrame = !blinkFrame;
 
                 // recalculate the 

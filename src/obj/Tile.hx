@@ -12,11 +12,11 @@ class Tile extends h2d.Graphics {
 	private function updateGraphics() {
 		clear();
 		
-		lineStyle(settings.Grid.LINESIZE, settings.Grid.COLOR, settings.Grid.OPACITY);
+		lineStyle(settings.Grid.LINESIZE, Settings.ui2Color, settings.Grid.OPACITY);
 		drawRect(-settings.Grid.SIZE/2,-settings.Grid.SIZE/2,settings.Grid.SIZE,settings.Grid.SIZE);
 
 		for (direction => color in blockings) {
-			lineStyle(settings.Grid.LINESIZE, color, settings.Grid.COLOR);
+			lineStyle(settings.Grid.LINESIZE, color, Settings.ui2Color);
 			switch(direction) {
 				case Up: 
 					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2 + settings.Grid.LINESIZE);

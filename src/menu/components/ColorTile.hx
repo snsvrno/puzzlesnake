@@ -49,7 +49,8 @@ class ColorTile extends h2d.Graphics {
 
             // if the state is unselected then we need to darken the tile
             case Unselected:
-                beginFill(0x000000, 0.65);
+                clear();
+                beginFill(tools.Colors.grayScale(colorValue));
                 drawRect(0, 0, this.size, this.size);
 
             // we do nothing if it is selected
@@ -58,7 +59,7 @@ class ColorTile extends h2d.Graphics {
             // highlighted means that this is the currently "over" item.
             case Highlighted:
                 endFill();
-                lineStyle(1, 0xFFFFFF);
+                lineStyle(1, Settings.uiSelectedColor);
                 drawRect(0, 0, this.size, this.size);
         }
 
