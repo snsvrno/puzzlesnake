@@ -143,15 +143,14 @@ class Window extends hxd.App {
 		var window = hxd.Window.getInstance();
 
 		backgroundFill.clear();
-		backgroundFill.beginFill(Settings.backgroundColor);
+		backgroundFill.beginFill(0x000000);
 		backgroundFill.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		backgroundFill.endFill();
 
 		// updating the background we are sending the shader, but only if we don't have the crt effect enabled.
 		// this is because the crt effect doesn't go to the edge of the screen and its visible when using 
 		// lighter backgrounds. if we have it enabled then we just send black.
-		if (crtFilter.enable) bubble.backgroundColor.setColor(0x000000);
-		else bubble.backgroundColor.setColor(Settings.backgroundColor);
+		bubble.backgroundColor.setColor(0x000000);
 	}
 
 	//////////////////////////////////////////////////////////////////
