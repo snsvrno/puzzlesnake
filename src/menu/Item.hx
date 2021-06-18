@@ -13,8 +13,19 @@ class Item extends h2d.Object {
     public var height : Int;
     public var width : Int;
 
+    private var interactive : h2d.Interactive;
+
     // is this item selected by the parent menu.
     private var isSelected : Bool = false;
+    public var onOverCallback : Null<(item : Item) -> Void>;
+    public var onOutCallback : Null<(item : Item) -> Void>;
+    public var onActivateCallback : Null<(item : Item) -> Void>;
+
+    public var onPress : Null<() -> Void>;
+
+    #if debug
+    private var interactiveOverlay : h2d.Graphics;
+    #end
 
     public function new(?parent : h2d.Object) {
         super(parent);
@@ -27,6 +38,31 @@ class Item extends h2d.Object {
         game.Game.debug_graphics.add(debug_graphics, this);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         #end
+
+        interactive = new h2d.Interactive(0,0, this);
+        interactive.onOver = function (_) {
+            setSelected();
+            if (onOverCallback != null) onOverCallback(this);
+        }
+        interactive.onOut = function(_){
+            setUnSelected();
+            if (onOutCallback != null) onOutCallback(this);
+        }
+        interactive.onClick = (_) -> activate();
+
+        #if debug
+        interactiveOverlay = new h2d.Graphics(interactive);
+        #end
+    }
+
+    override function onAdd() {
+        super.onAdd();
+
+        #if debug
+        interactiveOverlay.beginFill(0xFF0000,0.2);
+        interactiveOverlay.lineStyle(1,0xFF0000,0.5);
+        interactiveOverlay.drawRect(0,0, interactive.width, interactive.height);
+        #end
     }
 
     public function forceRedraw() {
@@ -34,7 +70,6 @@ class Item extends h2d.Object {
         else setUnSelected();
     }
 
-    public var onPress : Null<() -> Void>;
 
     /**
      * sets this item's mouseover / keyover as true. should update
@@ -66,6 +101,7 @@ class Item extends h2d.Object {
      * that should be executed.
      */
     public function activate() : Void {
-        if (onPress != null) onPress(); 
+        if (onPress != null) onPress();
+        if (onActivateCallback != null) onActivateCallback(this); 
     };
 }

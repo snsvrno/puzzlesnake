@@ -1,5 +1,7 @@
 package menu.components;
 
+import h2d.Interactive;
+
 private enum ColorTileState {
     Selected;
     Highlighted;
@@ -15,11 +17,19 @@ class ColorTile extends h2d.Graphics {
     private var state : ColorTileState = Unselected;
     private var size : Int = 0;
 
+    private var interactive : h2d.Interactive;
+    public var onOverCallback : Null<(item : ColorTile) -> Void>;
+    public var onActivateCallback : Null<(item : ColorTile) -> Void>;
+
 
     public function new(color : Int, ?parent : h2d.Object) {
         super(parent);
 
         colorValue = color;
+        interactive = new h2d.Interactive(0, 0, this);
+        interactive.onOver = (_) -> if (onOverCallback != null) onOverCallback(this);
+        interactive.onClick = (_) -> if (onActivateCallback != null) onActivateCallback(this);
+        interactive.propagateEvents = true;
     }
 
     public function setHighlighted() {
@@ -38,7 +48,10 @@ class ColorTile extends h2d.Graphics {
     }
 
     public function drawColor(?size : Int) {
-        if (size != null) this.size = size;
+        if (size != null) { 
+            this.size = size;
+            interactive.height = interactive.width = size;
+        }
 
         clear();
 

@@ -19,7 +19,12 @@ class Choice extends Item {
         outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, Settings.ui2Color, 1);
         if (enableOutline) textObject.filter = outline;
         else inverted = true;
+
+        interactive.width = textObject.textWidth;
+        interactive.height = textObject.textHeight;
     }
+
+    
 
     public function setTextColor(color : Int) {
         textObject.color = h3d.Vector.fromColor(color);

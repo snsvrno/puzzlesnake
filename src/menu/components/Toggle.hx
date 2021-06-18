@@ -46,6 +46,9 @@ class Toggle extends Item {
 
         outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, Settings.ui2Color, 1);
         textObject.filter = outline;
+
+        interactive.width = textObject.textWidth + (stateText.x - textObject.x) + stateText.textWidth;
+        interactive.height = Math.max(textObject.textHeight, stateText.textHeight);
     }
 
     override function activate() {

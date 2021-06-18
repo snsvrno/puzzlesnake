@@ -12,6 +12,7 @@ class MultiItem extends Item {
 
     private var choices : Array<Choice> = [];
     private var originalPosition : Int = 0;
+    private var mouseOverSelected : Null<Int> = null;
 
     public var selected : Int = 0;
 
@@ -39,6 +40,11 @@ class MultiItem extends Item {
         var choice = new Choice(name, false);
         choices.push(choice);
         flex.addChild(choice);
+
+        // adds the callback if the base we use the mouse
+        choice.onOverCallback = onOverCallbackChild;
+        choice.onOutCallback = onOutCallbackChild;
+        choice.onActivateCallback = onActivateChild;
         
         // updating the graphics so we don't have to select it
         // to show what is selected the first time
@@ -59,6 +65,15 @@ class MultiItem extends Item {
 
     override public function setUnSelected() {
         super.setUnSelected();
+
+        if (mouseOverSelected != null) {
+            // returning to the normal selection if nothing
+            // was selected.
+            selected = mouseOverSelected;
+            mouseOverSelected = null;
+            setSelectedPosition();
+        }
+
         outline.color = Settings.ui2Color;
         textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
     }
@@ -90,5 +105,36 @@ class MultiItem extends Item {
 
     public function reset() {
         if (selected != originalPosition) onSelect(originalPosition);
+    }
+
+    private function onOverCallbackChild(item : Item) {
+        setSelected();
+
+        // can totally crash this thing.
+        var c = cast(item, Choice);
+        var i = choices.indexOf(c);
+        
+        if (mouseOverSelected == null) { mouseOverSelected = selected; }
+        setSelectedPosition(i);
+    }
+
+    /**
+     * needs to check if the item is selected so that it will
+     * not unselect it.
+     * @param item 
+     */
+    private function onOutCallbackChild(item : Item) {
+
+        // can totally crash this thing.
+        var c = cast(item, Choice);
+        var i = choices.indexOf(c);
+        if (selected == i) item.setSelected();
+    }
+
+    private function onActivateChild(item : Item) {
+
+        mouseOverSelected = null;
+        setSelectedPosition();
+        if (onSelect != null) onSelect(selected);
     }
 }

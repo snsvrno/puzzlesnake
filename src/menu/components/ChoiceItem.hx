@@ -24,6 +24,9 @@ class ChoiceItem extends Item {
 
         flex.addChild(newChoice);
         choices.push(newChoice);
+        
+        interactive.width = flex.innerWidth;
+        interactive.height = flex.innerHeight;
     }
 
     override function setSelected() {

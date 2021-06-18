@@ -15,6 +15,16 @@ class ColorItem extends Item {
 
     private var colors : Array<ColorTile> = [];
 
+    /**
+     * a check to see if we got to this point because we 
+     * used a mouse or the keys.
+     * 
+     * checking this because if we use the mouse we need
+     * to click in order to set that color. if we use the
+     * keys then we set the color just by scrolling.
+     */
+    private var originalOverSelected : Null<Int> = null;
+
     public var selected : Int = 0;
 
     public var colorSize(default, set) : Int = 16;
@@ -57,6 +67,14 @@ class ColorItem extends Item {
         super.setUnSelected();
         outline.color = Settings.ui2Color;
         textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+
+        // checks if just moused over stuff with the mouse, if we did
+        // then we must revert it
+        if (originalOverSelected != null) {
+            trace(originalOverSelected);
+            setSelectedPosition(originalOverSelected);
+            originalOverSelected == null;
+        }
     }
 
     public function setSelectedPosition(?pos : Int) {
@@ -95,15 +113,28 @@ class ColorItem extends Item {
         colors.push(object);
 
         object.drawColor(colorSize);
+        object.onOverCallback = onChildOverCallback;
 
         // adds the object to the flex so we display it.
         flex.addChild(object);
 
         // centers the flex inside of this item container.
         //flex.x = -flex.outerWidth / 2;
+
+        interactive.width = flex.innerWidth;
+        interactive.height = flex.innerHeight;
     }
 
     override public function moveChoice(direction : Int) {
+
+        if (originalOverSelected != null) {
+            // we check if we were moving around on the mouse, because if we were
+            // then we ignore the selected position and revert it back to the 
+            // position it was before we started moving the mouse.
+            selected = originalOverSelected;
+            originalOverSelected == null;
+        }
+
         if (direction < 0) selected = selected - 1;
         else if (direction > 0) selected = selected + 1;
 
@@ -111,5 +142,11 @@ class ColorItem extends Item {
         else if (selected < 0) selected = 0;
 
         setSelectedPosition();
+    }
+
+    private function onChildOverCallback(item : ColorTile) {
+        if (originalOverSelected == null) originalOverSelected = selected;
+        var i = colors.indexOf(item);
+        setSelectedPosition(i);
     }
 }

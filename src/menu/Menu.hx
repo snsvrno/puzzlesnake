@@ -71,6 +71,8 @@ class Menu extends h2d.Object {
         //   issues where it would be distorted because it was drawing on sub-pixels.
         flex.x = Math.floor(width / 2 - flex.outerWidth / 2);
         flex.y = Math.floor(height / 2 - flex.outerHeight / 2);
+
+        item.onOverCallback = onOverCallback;
     }
 
     public function selectItem(?pos : Int = 0) {
@@ -116,5 +118,25 @@ class Menu extends h2d.Object {
 
     private function activateItem() {
         items[selectedItem].activate();
+    }
+
+    /**
+     * a callback function that we can use to
+     * unselect menu items whenver another gets selected
+     * if we are doing it from a mouse or touch press.
+     * @param item 
+     */
+    private function onOverCallback(item : Item) {
+        for (i in 0 ... items.length) {
+            if (items[i] != item) { 
+                // unselect all the other items just in case.
+                items[i].setUnSelected();
+            } else {
+                // we set the last selected item as this item
+                // so if we switch back to gamepad / keyboard it
+                // will work.
+                selectedItem = i;
+            }
+        }
     }
 }
