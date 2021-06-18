@@ -147,8 +147,11 @@ class Window extends hxd.App {
 		backgroundFill.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		backgroundFill.endFill();
 
-		// updating the background we are sending the shader.
-		bubble.backgroundColor.setColor(Settings.backgroundColor);
+		// updating the background we are sending the shader, but only if we don't have the crt effect enabled.
+		// this is because the crt effect doesn't go to the edge of the screen and its visible when using 
+		// lighter backgrounds. if we have it enabled then we just send black.
+		if (crtFilter.enable) bubble.backgroundColor.setColor(0x000000);
+		else bubble.backgroundColor.setColor(Settings.backgroundColor);
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -167,7 +170,9 @@ class Window extends hxd.App {
 
 	public function crtShaderEnabled() : Bool return crtFilter.enable;
 	public function toggleCrtShader(?state : Bool) : Bool { 
-		if (state != null) return crtFilter.enable = state;
-		else return crtFilter.enable = !crtFilter.enable;
+		if (state != null) crtFilter.enable = state;
+		else crtFilter.enable = !crtFilter.enable;
+		redrawBackground();
+		return crtFilter.enable;
 	}
 }
