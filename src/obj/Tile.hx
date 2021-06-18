@@ -22,7 +22,7 @@ class Tile extends h2d.Graphics {
 
 		for (direction => variant in blockings) {
 			var color = Settings.getFoodColor(variant);
-			lineStyle(settings.Grid.LINESIZE, color, Settings.ui2Color);
+			lineStyle(settings.Grid.LINESIZE, color, 1);
 			switch(direction) {
 				case Up: 
 					moveTo(-settings.Grid.SIZE/2, -settings.Grid.SIZE/2 + settings.Grid.LINESIZE);
