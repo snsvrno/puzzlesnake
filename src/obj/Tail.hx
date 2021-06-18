@@ -11,4 +11,11 @@ class Tail extends GridObject {
 		fillColor = food.fillColor;
 		updateGraphics();
 	}
+
+	override function forceRedraw() {
+		// updates the color
+		fillColor = Settings.getFoodColor(variant);
+		// redraws it
+		super.forceRedraw();
+	}
 }

@@ -13,6 +13,9 @@ class Item extends h2d.Object {
     public var height : Int;
     public var width : Int;
 
+    // is this item selected by the parent menu.
+    private var isSelected : Bool = false;
+
     public function new(?parent : h2d.Object) {
         super(parent);
 
@@ -26,6 +29,11 @@ class Item extends h2d.Object {
         #end
     }
 
+    public function forceRedraw() {
+        if (isSelected) setSelected();
+        else setUnSelected();
+    }
+
     public var onPress : Null<() -> Void>;
 
     /**
@@ -33,14 +41,18 @@ class Item extends h2d.Object {
      * shaders / or drawing parameters so that the item is now shown
      * as `over`
      */
-    public function setSelected (): Void { };
+    public function setSelected (): Void { 
+        isSelected = true;
+    };
 
     /**
      * sets this item's mouseover / keyover as false. should update
      * shaders / or drawing parameters so that this item is now shown
      * as `normal` or `not over`
      */
-    public function setUnSelected() : Void { };
+    public function setUnSelected() : Void { 
+        isSelected = false;
+    };
 
     /**
      * moves the item choice left and right based on the input direction. should

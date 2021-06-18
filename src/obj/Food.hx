@@ -16,6 +16,13 @@ class Food extends GridObject {
 		setVariantRandom(variantupperlimit);
 	}
 
+	override function forceRedraw() {
+		// make sure we get the most recent color.
+		setVariant(variant);
+		// then do the redraw stuffs.
+		super.forceRedraw();
+	}
+
 	public function setVariantRandom(?upperlimit : Int) {
 		if (upperlimit == null) upperlimit = 6;
 

@@ -7,6 +7,14 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     var menu = new menu.Menu(width, height, "Visual Options");
     menu.setDescription("options to adjust the gameplay and difficulty (changes aren't made until a new game is started)");
 
+    var paletteChoice = new menu.components.MultiItem("Palette");
+    for (p in palettes.Palettes.all) {
+        // we load each palette.
+        paletteChoice.addChoice(p.name);
+    }
+    paletteChoice.onSelect = (position : Int) -> Settings.setPalette(palettes.Palettes.all[position]);
+    menu.addItem(paletteChoice);
+
     var bubbleShader = new menu.components.Toggle("Bubble Effect");
     bubbleShader.originalState = Game.instance.bubbleShaderEnabled();
     bubbleShader.onToggle = (state : Bool) -> game.Game.instance.toggleBubbleShader(state);

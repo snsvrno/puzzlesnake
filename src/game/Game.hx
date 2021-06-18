@@ -10,6 +10,19 @@ class Game extends core.Window {
 	static public function getwidth() : Int return instance.grid.width;
 	static public function getheight() : Int return instance.grid.height;
 
+	/**
+	 * Forces the redraw of all the graphical elements, primarily used
+	 * when switching palettes to ensure that everything gets updated
+	 * and everything is using the new colors.
+	 */
+	static public function forceRedraw() {
+		obj.GridObject.redrawAll();
+		instance.ui.forceRedraw();
+		instance.grid.forceRedraw();
+		instance.redrawBackground();
+		for (m in instance.menu) m.forceRedraw();
+	}
+
 	static public function newGame() { 
 		
 		// we remove all the menus
@@ -316,7 +329,7 @@ class Game extends core.Window {
 			}
 
 			// update your color to the tail color
-			if (tails.length > 0) player.setHeadColor(tails[tails.length-1].getColor());
+			if (tails.length > 0) player.setHeadColor(tails[tails.length-1].variant);
 
 			// since we ate a food we should check if we need to populate more 
 			// food
@@ -606,11 +619,11 @@ class Game extends core.Window {
 		
 		for (w in walls.iter()) {
 			if (grid.isEdge(w.gx, w.gy)) {
-				if (w.gx == 0) grid.getTile(grid.width - 1, w.gy).setBlocking(Right, w.getOutlineColor());
-				else if (w.gx == grid.width-1) grid.getTile(0, w.gy).setBlocking(Left, w.getOutlineColor());
+				if (w.gx == 0) grid.getTile(grid.width - 1, w.gy).setBlocking(Right, w.variant);
+				else if (w.gx == grid.width-1) grid.getTile(0, w.gy).setBlocking(Left, w.variant);
 
-				if (w.gy == 0) grid.getTile(w.gx, grid.height - 1).setBlocking(Down, w.getOutlineColor());
-				else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).setBlocking(Up, w.getOutlineColor());
+				if (w.gy == 0) grid.getTile(w.gx, grid.height - 1).setBlocking(Down, w.variant);
+				else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).setBlocking(Up, w.variant);
 			}
 		}
 	}

@@ -17,11 +17,7 @@ class Food extends h2d.Graphics {
         super(parent);
 
         this.variant = variant;
-        var color = Settings.getFoodColor(variant);
-
-        beginFill(color);
-        drawRect(-settings.Ui.FOOD_SIZE/2, -settings.Ui.FOOD_SIZE/2, settings.Ui.FOOD_SIZE, settings.Ui.FOOD_SIZE);
-        endFill();
+        drawGraphics();
 
         // sets up the text.
         textValue = new h2d.Text(hxd.res.DefaultFont.get(), this);
@@ -29,6 +25,18 @@ class Food extends h2d.Graphics {
         textValue.color = h3d.Vector.fromColor(Settings.ui1Color);
         textValue.x = settings.Ui.FOOD_SIZE/2 + 2;
         textValue.y = -textValue.textHeight/2 - 1;
+    }
+
+    private function drawGraphics() {
+        clear();
+        beginFill(Settings.getFoodColor(variant));
+        drawRect(-settings.Ui.FOOD_SIZE/2, -settings.Ui.FOOD_SIZE/2, settings.Ui.FOOD_SIZE, settings.Ui.FOOD_SIZE);
+        endFill();
+    }
+
+    public function forceRedraw() {
+        textValue.color = h3d.Vector.fromColor(Settings.ui1Color);
+        drawGraphics();
     }
 
     private function updateValue() {

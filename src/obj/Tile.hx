@@ -6,6 +6,11 @@ class Tile extends h2d.Graphics {
 
 	public function new(parent : h2d.Object) {
 		super(parent);
+
+		updateGraphics();
+	}
+
+	public function forceRedraw() {
 		updateGraphics();
 	}
 
@@ -15,7 +20,8 @@ class Tile extends h2d.Graphics {
 		lineStyle(settings.Grid.LINESIZE, Settings.ui2Color, settings.Grid.OPACITY);
 		drawRect(-settings.Grid.SIZE/2,-settings.Grid.SIZE/2,settings.Grid.SIZE,settings.Grid.SIZE);
 
-		for (direction => color in blockings) {
+		for (direction => variant in blockings) {
+			var color = Settings.getFoodColor(variant);
 			lineStyle(settings.Grid.LINESIZE, color, Settings.ui2Color);
 			switch(direction) {
 				case Up: 
@@ -43,8 +49,8 @@ class Tile extends h2d.Graphics {
 		if (cleared) updateGraphics();
 	}
 
-	public function setBlocking(direction : Player.Direction, color : Int) {
-		if (blockings.get(direction) == null) blockings.set(direction, color);
+	public function setBlocking(direction : Player.Direction, variant : Int) {
+		if (blockings.get(direction) == null) blockings.set(direction, variant);
 		updateGraphics();
 	}
 }

@@ -124,4 +124,13 @@ class Grid extends h2d.Object {
 	public function isEdge(gx : Int, gy : Int) : Bool {
 		return gx == 0 || gy == 0 || gx == width - 1 || gy == height - 1;
 	}
+
+	/**
+	 * redraw the graphics for each cell, only needed to be used when the color palette
+	 * is updated to ensure all parts of the tiles have the right colors. otherwise only
+	 * some of it will redraw (based on need)
+	 */
+	public function forceRedraw() {
+		foreach(function(t : obj.Tile) t.forceRedraw());
+	}
 }

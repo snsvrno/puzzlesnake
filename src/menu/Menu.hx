@@ -37,6 +37,10 @@ class Menu extends h2d.Object {
         }
     }
 
+    public function forceRedraw() {
+        for (i in items) i.forceRedraw();
+    }
+
     override function onAdd() {
         super.onAdd();
 

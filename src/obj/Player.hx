@@ -10,18 +10,30 @@ class Player extends GridObject {
 	private var eyePadding : Int = 2;
 	private var eyeColor : Int = 0xFFFFFF;
 
+	// the current variant number for the head, so we know
+	// what to change it to if we are changing the palette.
+	private var headVariant : Int = 0;
+	// some unused code, for when i tried to make the snake
+	// a gradient...
 	private var lastColor : Int;
 
 	public function new(?parent : h2d.Object) {
 		super(parent);
 
 		// settings
-		fillColor = Utils.RGBToHex(0,0,255);
+		fillColor = Settings.getFoodColor(0);
 		lastColor = Utils.RGBToHex(0,0,150);
 
 		setRandomDirection();
 
 		updateGraphics();
+	}
+
+	override function forceRedraw() {
+		// makes sure he is the right color
+		fillColor = Settings.getFoodColor(headVariant);
+		// updates the graphics.
+		super.forceRedraw();
 	}
 
 	override function updateGraphics() {
@@ -68,8 +80,9 @@ class Player extends GridObject {
 		return { gx : ngx, gy : ngy };
 	}
 
-	public function setHeadColor(color : Int) {
-		fillColor = color;
+	public function setHeadColor(variant : Int) {
+		headVariant = variant;
+		fillColor = Settings.getFoodColor(variant);
 		updateGraphics();
 	}
 

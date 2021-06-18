@@ -73,4 +73,11 @@ class Manager extends h2d.Object {
         if (score != null) score.value += valueToAdd;
     }
 
+    public function forceRedraw() {
+        drawBackground();
+
+        for (f in foods) f.forceRedraw();
+        score.forceRedraw();
+    }
+
 }

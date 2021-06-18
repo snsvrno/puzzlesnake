@@ -48,11 +48,13 @@ class ColorItem extends Item {
     }
 
     override public function setSelected() { 
+        super.setSelected();
         outline.color = Settings.uiSelectedColor;
         textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
     }
 
     override public function setUnSelected() { 
+        super.setUnSelected();
         outline.color = Settings.ui2Color;
         textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
     }

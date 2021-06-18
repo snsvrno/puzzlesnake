@@ -6,6 +6,7 @@ class GridObject extends h2d.Graphics {
 	static private var objects : Array<GridObject> = [];
 	static public function runAllTicks() for (o in objects) o.turnTick();
 	static public function runAppUpdates(dt : Float) for (o in objects) o.update(dt);
+	static public function redrawAll() for (o in objects) o.forceRedraw();
 
 	/*** the standard grid size, of the base game grid */
 	private var size : Int = settings.Grid.SIZE;
@@ -22,9 +23,14 @@ class GridObject extends h2d.Graphics {
 
 	public function new(?parent : h2d.Object) {
 		super(parent);
+		
 		// adds this to the master list of objects
 		objects.push(this);
 
+		updateGraphics();
+	}
+
+	public function forceRedraw() {
 		updateGraphics();
 	}
 

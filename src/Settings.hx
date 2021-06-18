@@ -40,6 +40,14 @@ class Settings {
 		hxd.Save.save(instance);
 	}
 
+	static public function setPalette(p : structures.ColorPalette) {
+		game.Game.log('changing palette to ${p.name}');
+		instance.palette = p;
+
+		// now we need to force everything to redraw.
+		game.Game.forceRedraw();
+	}
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Instance Stuff.
 

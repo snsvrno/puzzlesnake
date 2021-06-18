@@ -7,8 +7,9 @@ class Choice extends Item {
 
     private var outline : h2d.filter.Outline;
     private var textObject : h2d.Text;
+    private var inverted : Bool = false;
 
-    public function new(text : String, ?parent : h2d.Object) {
+    public function new(text : String, ?enableOutline : Bool = true, ?parent : h2d.Object) {
         super(parent);
         textObject = new h2d.Text(hxd.res.DefaultFont.get(), this);
 
@@ -16,16 +17,25 @@ class Choice extends Item {
         textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
 
         outline = new h2d.filter.Outline(settings.MenuItem.OUTLINE_SIZE, Settings.ui2Color, 1);
-        textObject.filter = outline;
+        if (enableOutline) textObject.filter = outline;
+        else inverted = true;
+    }
+
+    public function setTextColor(color : Int) {
+        textObject.color = h3d.Vector.fromColor(color);
     }
 
     override public function setSelected() { 
+        super.setSelected();
         outline.color = Settings.uiSelectedColor;
-        textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        if (inverted) textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+        else textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
     }
 
     override public function setUnSelected() { 
+        super.setUnSelected();
         outline.color = Settings.ui2Color;
-        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+        if (inverted) textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        else textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
     }
 }

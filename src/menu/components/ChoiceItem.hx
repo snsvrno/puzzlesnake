@@ -27,6 +27,7 @@ class ChoiceItem extends Item {
     }
 
     override function setSelected() {
+        super.setSelected();
         for (i in 0 ... choices.length) {
             if (i == selected) choices[i].setSelected();
             else choices[i].setUnSelected();
@@ -34,6 +35,7 @@ class ChoiceItem extends Item {
     }
 
     override function setUnSelected() {
+        super.setUnSelected();
         for (i in 0 ... choices.length) choices[i].setUnSelected();
     }
 

@@ -17,6 +17,10 @@ class Score extends h2d.Object {
         updateDisplay();
     }
 
+    public function forceRedraw() {
+        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+    }
+
     private function updateDisplay() {
         textObject.text = '$value';
         textObject.x = -1 * textObject.textWidth;

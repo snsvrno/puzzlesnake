@@ -133,13 +133,22 @@ class Window extends hxd.App {
 		world.y = viewportPadding.top + (window.height - viewportHeight * world.scaleY - viewportPadding.top - viewportPadding.bottom)/2;
 
 		// update the background fill.
+		redrawBackground();
+
+		crt.screenWidth = width;
+		crt.screenHeight = height;
+	}
+
+	public function redrawBackground() {
+		var window = hxd.Window.getInstance();
+
 		backgroundFill.clear();
 		backgroundFill.beginFill(Settings.backgroundColor);
 		backgroundFill.drawRect(-world.x / world.scaleX,-world.y / world.scaleY, window.width / world.scaleX, window.height / world.scaleY);
 		backgroundFill.endFill();
 
-		crt.screenWidth = width;
-		crt.screenHeight = height;
+		// updating the background we are sending the shader.
+		bubble.backgroundColor.setColor(Settings.backgroundColor);
 	}
 
 	//////////////////////////////////////////////////////////////////

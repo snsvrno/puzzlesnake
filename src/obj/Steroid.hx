@@ -5,7 +5,6 @@ package obj;
  */
 class Steroid extends Food {
 
-    private var startingColor : Int;
     private var blinkFrame : Bool = false;
     private var life : Int;
     
@@ -24,13 +23,20 @@ class Steroid extends Food {
         if (life != null) this.life = life;
         else this.life = settings.Game.STEROID_LIFE;
 
-		startingColor = fillColor = Settings.getFoodColor(variant);
+		fillColor = Settings.getFoodColor(variant);
 
         // we set sinB per the description in turnTick();
         sinB = Math.floor(settings.Game.STEROID_LIFE / 2);
 
 		updateGraphics();
 	}
+
+    override function forceRedraw() {
+        // updates the color
+        if (blinkFrame) fillColor = Settings.getFoodColor(variant);
+        // draws it.
+        super.forceRedraw();
+    }
 
     override function update(dt : Float) {
         if (life == 0) {
@@ -92,7 +98,7 @@ class Steroid extends Food {
         if (doBlink) {
             
             // update the color. if we are going to blink
-            if (blinkFrame) fillColor = startingColor;
+            if (blinkFrame) fillColor = Settings.getFoodColor(variant);
             else fillColor = 0xFFFFFF;
             blinkFrame = !blinkFrame;
 
@@ -131,7 +137,7 @@ class Steroid extends Food {
 
         // manually gets the color and variant the same.
         food.variant = variant;
-        food.fillColor = startingColor;
+        food.fillColor = Settings.getFoodColor(variant);
         food.updateGraphics();
 
         // sets the value
