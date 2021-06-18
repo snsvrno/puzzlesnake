@@ -85,9 +85,12 @@ class Toggle extends Item {
      */
     public function reset() {
 
-        // so we do the opposite here because we are going to toggle it
-        // when we activate it ... probably not the best way to do this.
-        state = !originalState;
-        activate();
+        if (state != originalState) { 
+            // so we do the opposite here because we are going to toggle it
+            // when we activate it ... probably not the best way to do this.
+            state = !originalState;
+            activate();
+        }
+
     }
 }

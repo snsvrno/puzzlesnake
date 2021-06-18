@@ -30,7 +30,11 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     bloomShader.onToggle = (state : Bool) -> game.Game.instance.toggleBloomShader(state);
     menu.addItem(bloomShader);
 
-    var fullScreen = new menu.components.Toggle("Fullscreen");
+    var fullScreen = {
+        var window = hxd.Window.getInstance();
+        new menu.components.Toggle("Fullscreen", window.displayMode == Borderless);
+    }
+
     fullScreen.onToggle = function(state : Bool){ 
         var window = hxd.Window.getInstance();
         
