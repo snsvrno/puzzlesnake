@@ -25,6 +25,9 @@ class Settings {
 	static public var uiSelectedColor(get, null) : Int;
 	static private function get_uiSelectedColor() : Int return instance.palette.uiSelected; 
 
+	static public var currentPalette(get, null) : String;
+	static private function get_currentPalette() : String return instance.palette.name;
+
 	/**
 	 * creates a new settings, attempts to load it from the save, and if it doesn't
 	 * exist then uses the default stuff.

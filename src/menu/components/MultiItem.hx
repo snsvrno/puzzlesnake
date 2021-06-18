@@ -11,6 +11,7 @@ class MultiItem extends Item {
     private var outline : h2d.filter.Outline;
 
     private var choices : Array<Choice> = [];
+    private var originalPosition : Int = 0;
 
     public var selected : Int = 0;
 
@@ -34,7 +35,7 @@ class MultiItem extends Item {
         textObject .filter = outline;
     }
 
-    public function addChoice(name : String) {
+    public function addChoice(name : String) : Int {
         var choice = new Choice(name, false);
         choices.push(choice);
         flex.addChild(choice);
@@ -42,6 +43,7 @@ class MultiItem extends Item {
         // updating the graphics so we don't have to select it
         // to show what is selected the first time
         setSelectedPosition();
+        return choices.length - 1;
     }
 
     override function forceRedraw() {
@@ -70,6 +72,11 @@ class MultiItem extends Item {
         }
     }
 
+    public function setOriginalSelectedPosition(pos : Int) {
+        setSelectedPosition(pos);
+        originalPosition = pos;
+    }
+
     override public function moveChoice(direction : Int) {
         if (direction < 0) selected = selected - 1;
         else if (direction > 0) selected = selected + 1;
@@ -79,5 +86,9 @@ class MultiItem extends Item {
 
         setSelectedPosition();
         if (onSelect != null) onSelect(selected);
+    }
+
+    public function reset() {
+        if (selected != originalPosition) onSelect(originalPosition);
     }
 }

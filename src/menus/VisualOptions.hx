@@ -8,11 +8,14 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     menu.setDescription("options to adjust the gameplay and difficulty (changes aren't made until a new game is started)");
 
     var paletteChoice = new menu.components.MultiItem("Palette");
+    var currentPalette = 0;
     for (p in palettes.Palettes.all) {
         // we load each palette.
-        paletteChoice.addChoice(p.name);
+        var i = paletteChoice.addChoice(p.name);
+        if (p.name == Settings.currentPalette) currentPalette = i;
     }
     paletteChoice.onSelect = (position : Int) -> Settings.setPalette(palettes.Palettes.all[position]);
+    paletteChoice.setOriginalSelectedPosition(currentPalette);
     menu.addItem(paletteChoice);
 
     var bubbleShader = new menu.components.Toggle("Bubble Effect");
@@ -56,6 +59,7 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
         bubbleShader.reset();
         crtShader.reset();
         fullScreen.reset();
+        paletteChoice.reset();
         // go back
         game.Game.shiftMenu();
     });
