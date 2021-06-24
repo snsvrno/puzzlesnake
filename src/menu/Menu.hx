@@ -75,17 +75,25 @@ class Menu extends h2d.Object {
         item.onOverCallback = onOverCallback;
     }
 
-    public function selectItem(?pos : Int = 0) {
+    /**
+     * will attempt to select the item at the position. it will return if the item
+     * was selected or not (if the item is selectable)
+     * @param pos 
+     * @return Bool
+     */
+    public function selectItem(?pos : Int = 0) : Bool {
         // makes sure we don't give it a number that is
         // out of the bounds.
         if (pos < 0 || pos > items.length) pos = 0;
 
-        items[pos].setSelected();
+        var selectable = items[pos].setSelected();
 
         // makes sure that all the other items are deselected.
         for (i in 0 ... items.length) if (i != pos) items[i].setUnSelected();
 
         selectedItem = pos;
+
+        return selectable;
     }
 
     public function keypressed(keycode : Int) {
@@ -105,7 +113,7 @@ class Menu extends h2d.Object {
 
         if (selectedItem < 0) selectedItem = items.length-1;
 
-        selectItem(selectedItem);
+        if (selectItem(selectedItem) == false) previousItem();
     }
 
     private function nextItem() {
@@ -113,7 +121,7 @@ class Menu extends h2d.Object {
 
         if (selectedItem > items.length - 1) selectedItem = 0;
 
-        selectItem(selectedItem);
+        if (selectItem(selectedItem) == false) nextItem();
     }
 
     private function activateItem() {

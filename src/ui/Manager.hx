@@ -50,6 +50,7 @@ class Manager extends h2d.Object {
             score.y = height/2;
         } else {
             score.value = 0;
+            score.visible = true;
         }
     }
 
@@ -69,8 +70,15 @@ class Manager extends h2d.Object {
         return null;
     }   
 
-    public function updateScore(valueToAdd : Int) {
-        if (score != null) score.value += valueToAdd;
+    public function updateScore(newValue : Int) {
+        if (score != null) { 
+            score.value = newValue;
+            score.visible = true;
+        }
+    }
+
+    public function hideScore() {
+        score.visible = false;
     }
 
     public function forceRedraw() {

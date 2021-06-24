@@ -30,11 +30,12 @@ class Choice extends Item {
         textObject.color = h3d.Vector.fromColor(color);
     }
 
-    override public function setSelected() { 
+    override public function setSelected() : Bool { 
         super.setSelected();
         outline.color = Settings.uiSelectedColor;
         if (inverted) textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
         else textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        return true;
     }
 
     override public function setUnSelected() { 

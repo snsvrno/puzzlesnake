@@ -51,7 +51,7 @@ class Item extends h2d.Object {
         interactive.onClick = (_) -> activate();
 
         #if debug
-        interactiveOverlay = new h2d.Graphics(interactive);
+        interactiveOverlay = new h2d.Graphics();
         #end
     }
 
@@ -76,8 +76,9 @@ class Item extends h2d.Object {
      * shaders / or drawing parameters so that the item is now shown
      * as `over`
      */
-    public function setSelected (): Void { 
+    public function setSelected () : Bool { 
         isSelected = true;
+        return true;
     };
 
     /**
