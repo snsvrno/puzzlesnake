@@ -98,6 +98,14 @@ class Item extends h2d.Object {
     public function moveChoice(direction : Int) : Void { };
 
     /**
+     * only used if the parent menul has verticalScroll disabled. this will then get taht
+     * scroll command and it will be passed to the currently active item. should only
+     * receive a `1` and `-1` but you should not assume that. check for sign only.
+     * @param direction 
+     */
+    public function verticalScroll(direction : Int) : Void { };
+
+    /**
      * what happens if the user clicks `enter` on this item. is there some kind of action
      * that should be executed.
      */

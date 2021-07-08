@@ -7,9 +7,11 @@ class LetterEntry extends Item {
     private var textObject : h2d.Text;
     private var outline : h2d.filter.Outline;
 
-    private var letters : Array<h2d.Text>;
+    private var letters : Array<LetterEntryLetter>;
 
     private var selectedCharacter : Int = 0;
+
+    public var disableSelectEffects : Bool = false;
 
     public function new(title : String, letters : Int, ?parent : h2d.Object) {
         super(parent);
@@ -25,14 +27,14 @@ class LetterEntry extends Item {
 
         letterFlex = new h2d.Flow(flex);
         letterFlex.layout = h2d.Flow.FlowLayout.Horizontal;
-        flex.horizontalSpacing = 6;
+        letterFlex.horizontalSpacing = 6;
+        flex.horizontalSpacing = 12;
 
         this.letters = [];
 
         for (_ in 0 ... letters) {
-            var letter = new h2d.Text(hxd.res.DefaultFont.get(), letterFlex);
-            letter.color = h3d.Vector.fromColor(Settings.ui1Color);
-            letter.text = "A";
+            var letter = new LetterEntryLetter(letterFlex);
+            letter.color = Settings.ui1Color;
 
             this.letters.push(letter);
         }
@@ -44,20 +46,49 @@ class LetterEntry extends Item {
 
     public function getText() : String {
         var text : String = "";
-        for (i in letters) text += i.text;
+        for (letter in letters) text += letter.text;
         return text;
+    }
+
+    override function verticalScroll(direction:Int) {
+        if (direction < 0) letters[selectedCharacter].scrollUp();
+        else if (direction > 0) letters[selectedCharacter].scrollDown();
+    }
+
+    override function moveChoice(direction:Int) {
+        if (direction > 0) selectedCharacter += 1;
+        else if (direction < 0) selectedCharacter -=1;
+
+        if (selectedCharacter < 0) selectedCharacter = letters.length-1;
+        else if (selectedCharacter >= letters.length) selectedCharacter = 0;
+
+        setSelected();
     }
 
     override public function setSelected() : Bool { 
         super.setSelected();
-        outline.color = Settings.uiSelectedColor;
-        textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+
+        if (disableSelectEffects == false) {
+            outline.color = Settings.uiSelectedColor;
+            textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        }
+
+        for (i in 0 ... letters.length) {
+            if (i == selectedCharacter) letters[i].setSelected();
+            else letters[i].setUnselected();
+        }
+
         return true;
     }
 
     override public function setUnSelected() { 
         super.setUnSelected();
-        outline.color = Settings.ui2Color;
-        textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+
+        if (disableSelectEffects == false) {
+            outline.color = Settings.ui2Color;
+            textObject.color = h3d.Vector.fromColor(Settings.ui1Color);
+        }
+
+        for (letter in letters) letter.setUnselected();
     }
 }

@@ -11,6 +11,11 @@ class Menu extends h2d.Object {
     private var width : Int;
     private var height : Int;
 
+    /**
+     * if this menu can change the selected item by using the up and down commands.
+     */
+    public var verticalScroll : Bool = true;
+
     public function new(width : Int, height : Int, ?title : String, ?parent : h2d.Object) {
         super(parent);
 
@@ -100,9 +105,17 @@ class Menu extends h2d.Object {
 
         if (Controls.is("confirm", keycode)) activateItem();
         if (Controls.is("cancel", keycode)) game.Game.shiftMenu();
-		if (Controls.is("up", keycode)) previousItem();
-		if (Controls.is("down", keycode)) nextItem();
 
+        // SCROLLING
+        // if vertical scroll is enabled then we will scroll betwen items, otherwise
+        // we will pass that through to the selected item.
+		if (verticalScroll && Controls.is("up", keycode)) previousItem();
+        else if (Controls.is("up", keycode)) items[selectedItem].verticalScroll(-1);
+        // 
+		if (verticalScroll && Controls.is("down", keycode)) nextItem();
+        else if (Controls.is("down", keycode)) items[selectedItem].verticalScroll(1);
+
+        // selecting the choice, is always passed through to the selected item.
 		if (Controls.is("left", keycode)) items[selectedItem].moveChoice(-1);
 		if (Controls.is("right", keycode)) items[selectedItem].moveChoice(1);
         

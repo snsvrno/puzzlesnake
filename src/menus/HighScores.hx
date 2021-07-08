@@ -1,7 +1,5 @@
 package menus;
 
-
-
 function highScores(width : Int, height : Int) : menu.Menu {
     // testing for the menu
     var menu = new menu.Menu(width, height, "High Scores");
