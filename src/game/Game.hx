@@ -134,6 +134,52 @@ class Game extends core.Window {
 		
 	}
 
+	/**
+	 * saves all options and high scores
+	 */
+	static public function save() {
+
+		// saves the high scores
+		hxd.Save.save({
+			score : highScores,
+			options : instance.options,
+			lastUsedHighScoreName : lastUsedHighScoreName,
+		});
+	}
+
+	/**
+	 * loads all options and high scores.
+	 */
+	static public function load() {
+
+		var loadedData = hxd.Save.load();
+
+		if (Reflect.hasField(loadedData, "score")) highScores = Reflect.getProperty(loadedData,"score");
+		else highScores = [];
+
+		if (Reflect.hasField(loadedData, "options")) instance.options = Reflect.getProperty(loadedData, "options");
+		else instance.options = {
+			wallLength: 3,
+			colors: 2,
+			startingTickSpeed: 0.25,
+			tickMakeWall: 1.15,
+			tickEatFood: 0.95,
+			foodLimit: 3,
+			tickMovement: 0.9999,
+			foodGenBaseCut: 0.25,
+			foodGenPlayerCut: 0.75,
+		};
+
+		if (Reflect.hasField(loadedData, "lastUsedHighScoreName")) lastUsedHighScoreName = Reflect.getProperty(loadedData, "lastUsedHighScoreName");
+		else lastUsedHighScoreName = "AAA";
+	}
+
+	static public function clearData() {
+		
+		hxd.Save.save(null);
+
+	}
+
 	#if debug
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	static public function log(text : String) instance.console.log(text);
@@ -201,18 +247,8 @@ class Game extends core.Window {
 	override function init() {
 		super.init();
 
-		// sets the default options
-		options = {
-			wallLength: 3,
-			colors: 2,
-			startingTickSpeed: 0.25,
-			tickMakeWall: 1.15,
-			tickEatFood: 0.95,
-			foodLimit: 3,
-			tickMovement: 0.9999,
-			foodGenBaseCut: 0.25,
-			foodGenPlayerCut: 0.75,
-		};
+		// loads data
+		game.Game.load();
 
 		clock = new Clock(options.startingTickSpeed);
 
@@ -261,6 +297,10 @@ class Game extends core.Window {
 	 * do some kind of cleanup logic here
 	 */
 	public function quit() {
+
+		// saves things
+		game.Game.save();
+
 		hxd.System.exit();
 	}
 
@@ -268,6 +308,10 @@ class Game extends core.Window {
 	 * configures the game for a new play session (a new game)
 	 */
 	private function start() {
+
+		// saves stuff
+		game.Game.save();
+
 		clock.reset();
 		gameIsOver = false;
 

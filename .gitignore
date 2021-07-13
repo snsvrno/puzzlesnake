@@ -12,3 +12,6 @@ rel.archive
 
 # other files
 docs/
+
+# temporary files
+*.sav
