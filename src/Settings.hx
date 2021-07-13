@@ -44,7 +44,11 @@ class Settings {
 	}
 
 	static public function setPalette(p : structures.ColorPalette) {
+		#if debug
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		game.Game.log('changing palette to ${p.name}');
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		#end
 		instance.palette = p;
 
 		// now we need to force everything to redraw.

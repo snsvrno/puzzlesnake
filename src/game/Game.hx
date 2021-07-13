@@ -706,7 +706,11 @@ class Game extends core.Window {
 			f.setGridPosition(position);
 			foods.addObj(f);
 
+			#if debug
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			if (console != null) console.log('making food ${f.variant} at ${position.gx}, ${position.gy}');
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			#end
 		}
 	}
 
@@ -726,7 +730,11 @@ class Game extends core.Window {
 				}
 
 				if (colors.length == 0) {
+					#if debug
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 					console.log('can\'t make a steroid..');
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					#end
 					return;
 				}
 
@@ -738,7 +746,11 @@ class Game extends core.Window {
 			s.setGridPosition(position);
 			foods.addObj(s);
 
+			#if debug
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			if (console != null) console.log('making steroid.');
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			#end
 		} 
 	}
 
