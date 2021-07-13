@@ -43,7 +43,7 @@ class Settings {
 		hxd.Save.save(instance);
 	}
 
-	static public function setPalette(p : structures.ColorPalette) {
+	static public function setPalette(p : structures.ColorPalette, updateUi : Bool = true) {
 		#if debug
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		game.Game.log('changing palette to ${p.name}');
@@ -52,7 +52,20 @@ class Settings {
 		instance.palette = p;
 
 		// now we need to force everything to redraw.
-		game.Game.forceRedraw();
+		if (updateUi) game.Game.forceRedraw();
+	}
+
+	static public function setPaletteByName(name : String, updateUi : Bool) {
+		for (p in palettes.Palettes.all) {
+			if (p.name == name) {
+				setPalette(p, updateUi);
+				return;
+			}
+		}
+
+		#if debug
+		game.Game.log('no palette named $name');
+		#end
 	}
 
 	/////////////////////////////////////////////////////////////////////////////

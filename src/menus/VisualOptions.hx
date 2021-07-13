@@ -52,6 +52,7 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     var confirmation = new menu.components.ChoiceItem();
     confirmation.addChoice("Ok", function() {
         // everything is good, we keep all the setings that have been changed.
+        game.Game.save();
         game.Game.shiftMenu();
     });
     confirmation.addChoice("Cancel", function() {

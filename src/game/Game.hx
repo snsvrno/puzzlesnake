@@ -144,13 +144,20 @@ class Game extends core.Window {
 			score : highScores,
 			options : instance.options,
 			lastUsedHighScoreName : lastUsedHighScoreName,
+			settings : {
+				bloomShader : instance.bloomShaderEnabled(),
+				bubbleShader : instance.bubbleShaderEnabled(),
+				crtShader : instance.crtShaderEnabled(),
+				fullscreen : hxd.Window.getInstance().displayMode == Borderless,
+				palette : Settings.currentPalette,
+			}
 		});
 	}
 
 	/**
 	 * loads all options and high scores.
 	 */
-	static public function load() {
+	static public function load(updateUi : Bool = true) {
 
 		var loadedData = hxd.Save.load();
 
@@ -170,6 +177,24 @@ class Game extends core.Window {
 			foodGenPlayerCut: 0.75,
 		};
 
+		if (Reflect.hasField(loadedData, "settings")) {
+			var settings = Reflect.getProperty(loadedData, "settings");
+
+			// sets all the shaders.
+			instance.bubbleFilter.enable = Reflect.getProperty(settings, "bubbleShader");
+			instance.crtFilter.enable = Reflect.getProperty(settings, "crtShader");
+			instance.bloomFilter.enable = Reflect.getProperty(settings, "bloomShader");
+			
+			// fullscreen or not.
+			var isFullScreen = Reflect.getProperty(settings, "fullscreen");
+			var window = hxd.Window.getInstance();
+			if (isFullScreen) window.displayMode = Borderless;
+			else window.displayMode = Windowed;
+
+			var p = Reflect.getProperty(settings, "palette");
+			Settings.setPaletteByName(p, updateUi);
+		}
+
 		if (Reflect.hasField(loadedData, "lastUsedHighScoreName")) lastUsedHighScoreName = Reflect.getProperty(loadedData, "lastUsedHighScoreName");
 		else lastUsedHighScoreName = "AAA";
 	}
@@ -182,7 +207,7 @@ class Game extends core.Window {
 
 	#if debug
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	static public function log(text : String) instance.console.log(text);
+	static public function log(text : String) if (instance.console != null) instance.console.log(text);
 	static public var debug_graphics : debug.BoundsManager = new debug.BoundsManager();
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	#end
@@ -248,7 +273,7 @@ class Game extends core.Window {
 		super.init();
 
 		// loads data
-		game.Game.load();
+		game.Game.load(false);
 
 		clock = new Clock(options.startingTickSpeed);
 
@@ -309,9 +334,6 @@ class Game extends core.Window {
 	 */
 	private function start() {
 
-		// saves stuff
-		game.Game.save();
-
 		clock.reset();
 		gameIsOver = false;
 
@@ -363,6 +385,8 @@ class Game extends core.Window {
 		// remove the score indication on the topbar because it goes to '2'??
 		ui.hideScore();
 
+		// saves stuff
+		game.Game.save();
 	}
 
 	private function tick() {
@@ -581,7 +605,7 @@ class Game extends core.Window {
 
 		// check if the console is open, and if it is then we
 		// ignore all event processing.
-		if (console.isActive()) return;
+		if (console != null && console.isActive()) return;
 
 		// toggle fullscreen with a button. (F12)
 		if (e.kind == EKeyDown && e.keyCode == hxd.Key.F12) {
