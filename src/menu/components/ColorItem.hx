@@ -13,6 +13,8 @@ class ColorItem extends Item {
     private var textObject : h2d.Text;
     private var outline : h2d.filter.Outline;
 
+    public var onChoice : Null<(choice : Int) -> Void>;
+
     private var colors : Array<ColorTile> = [];
 
     /**
@@ -57,10 +59,11 @@ class ColorItem extends Item {
         filter = outline;
     }
 
-    override public function setSelected() { 
+    override public function setSelected() : Bool { 
         super.setSelected();
         outline.color = Settings.uiSelectedColor;
         textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        return true;
     }
 
     override public function setUnSelected() { 
@@ -71,7 +74,6 @@ class ColorItem extends Item {
         // checks if just moused over stuff with the mouse, if we did
         // then we must revert it
         if (originalOverSelected != null) {
-            trace(originalOverSelected);
             setSelectedPosition(originalOverSelected);
             originalOverSelected == null;
         }
@@ -85,6 +87,8 @@ class ColorItem extends Item {
             else if (i == selected) colors[i].setHighlighted();
             else colors[i].setUnselected();
         }
+
+        if (onChoice != null) onChoice(selected);
     }
 
     /**

@@ -57,10 +57,11 @@ class MultiItem extends Item {
         for (c in choices) c.forceRedraw();
     }
 
-    override public function setSelected() {
+    override public function setSelected() : Bool {
         super.setSelected();
         outline.color = Settings.uiSelectedColor;
         textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
+        return true;
     }
 
     override public function setUnSelected() {

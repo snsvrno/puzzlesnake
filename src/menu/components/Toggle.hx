@@ -60,11 +60,12 @@ class Toggle extends Item {
         setStateText();
     }
 
-    override public function setSelected() {
+    override public function setSelected() : Bool {
         super.setSelected();
         outline.color = Settings.uiSelectedColor;
         textObject.color = h3d.Vector.fromColor(Settings.ui2Color);
         stateText.color = h3d.Vector.fromColor(Settings.uiSelectedColor);
+        return true;
     }
 
     override public function setUnSelected() { 

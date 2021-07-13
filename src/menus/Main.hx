@@ -30,6 +30,16 @@ function main(width : Int, height : Int) : menu.Menu {
     }
     menu.addItem(visualOptions);
 
+    
+    var highScores = new menu.components.Choice("High Scores");
+    highScores.onPress = function() {
+        // adds the menu to the stack.
+        game.Game.setMenu(menus.HighScores.highScores(width, height));
+    }
+    menu.addItem(highScores);
+
+    
+
     var exit = new menu.components.Choice("Quit");
     exit.onPress = () -> game.Game.instance.quit();
     menu.addItem(exit);

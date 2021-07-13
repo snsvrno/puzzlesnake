@@ -51,7 +51,7 @@ class Item extends h2d.Object {
         interactive.onClick = (_) -> activate();
 
         #if debug
-        interactiveOverlay = new h2d.Graphics(interactive);
+        interactiveOverlay = new h2d.Graphics();
         #end
     }
 
@@ -76,8 +76,9 @@ class Item extends h2d.Object {
      * shaders / or drawing parameters so that the item is now shown
      * as `over`
      */
-    public function setSelected (): Void { 
+    public function setSelected () : Bool { 
         isSelected = true;
+        return true;
     };
 
     /**
@@ -95,6 +96,14 @@ class Item extends h2d.Object {
      * @param direction 
      */
     public function moveChoice(direction : Int) : Void { };
+
+    /**
+     * only used if the parent menul has verticalScroll disabled. this will then get taht
+     * scroll command and it will be passed to the currently active item. should only
+     * receive a `1` and `-1` but you should not assume that. check for sign only.
+     * @param direction 
+     */
+    public function verticalScroll(direction : Int) : Void { };
 
     /**
      * what happens if the user clicks `enter` on this item. is there some kind of action

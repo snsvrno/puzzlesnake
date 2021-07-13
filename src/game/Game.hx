@@ -5,6 +5,9 @@ class Game extends core.Window {
 	////////////////////////////////////////////////////////////////////
 	// STATIC STUFF
 
+	static public var highScores : Array<Array<{name : String, score : Int}>> = [];
+	static public var lastUsedHighScoreName : String = "AAA";
+
 	static public var instance : Game;
 
 	static public function getwidth() : Int return instance.grid.width;
@@ -73,6 +76,110 @@ class Game extends core.Window {
 		}
 	}
 
+	/**
+	 * replaces the current menu item with this item, similar in functionality
+	 * to calling a .shiftMenu() and .setMenu() except it will unpause anything
+	 * 
+	 * if calling on an empty menu stack it will just act like setMenu
+	 */
+	static public function replaceMenu(newMenu : menu.Menu) {
+		var menu = instance.menu.shift();
+		if (menu != null) instance.world.removeChild(menu);
+		setMenu(newMenu);
+	}
+
+	/**
+	 * tries to shift the menu, but if we are at the end of the stack then we set
+	 * the menu to the provided one.
+	 * @param newMenu 
+	 */
+	static public function shiftMenuOrSet(newMenu : menu.Menu) {
+		if (instance.menu.length == 1) replaceMenu(newMenu);
+		else shiftMenu();
+	}
+
+
+	private static function isNewHighScore(score : Int, difficulty : Int) : Bool {
+		return true;
+	}
+
+	public static function addHighScore(name : String, score : Int, colors : Int) {
+		
+		var difficulty = colors - 1;
+
+		while (highScores.length < 6) highScores.push([]);
+
+		var added = false;
+
+		if (highScores[difficulty].length > 0 && highScores[difficulty][0].score < score) {
+			highScores[difficulty].unshift({ name : name, score : score} );
+			added = true;
+		}
+
+		if (!added) {
+			for (i in 1 ... highScores[difficulty].length) {
+				if (highScores[difficulty][i-1].score >= score && score > highScores[difficulty][i].score) {
+					highScores[difficulty].insert(i, { name : name, score : score} );
+					added = true;
+					break;
+				} 
+			}
+		}
+
+		if (!added) highScores[difficulty].push( { name : name, score : score} );
+
+		while(highScores[difficulty].length > 5) {
+			highScores[difficulty].pop();
+		}
+		
+	}
+
+	/**
+	 * saves all options and high scores
+	 */
+	static public function save() {
+
+		// saves the high scores
+		hxd.Save.save({
+			score : highScores,
+			options : instance.options,
+			lastUsedHighScoreName : lastUsedHighScoreName,
+		});
+	}
+
+	/**
+	 * loads all options and high scores.
+	 */
+	static public function load() {
+
+		var loadedData = hxd.Save.load();
+
+		if (Reflect.hasField(loadedData, "score")) highScores = Reflect.getProperty(loadedData,"score");
+		else highScores = [];
+
+		if (Reflect.hasField(loadedData, "options")) instance.options = Reflect.getProperty(loadedData, "options");
+		else instance.options = {
+			wallLength: 3,
+			colors: 2,
+			startingTickSpeed: 0.25,
+			tickMakeWall: 1.15,
+			tickEatFood: 0.95,
+			foodLimit: 3,
+			tickMovement: 0.9999,
+			foodGenBaseCut: 0.25,
+			foodGenPlayerCut: 0.75,
+		};
+
+		if (Reflect.hasField(loadedData, "lastUsedHighScoreName")) lastUsedHighScoreName = Reflect.getProperty(loadedData, "lastUsedHighScoreName");
+		else lastUsedHighScoreName = "AAA";
+	}
+
+	static public function clearData() {
+		
+		hxd.Save.save(null);
+
+	}
+
 	#if debug
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	static public function log(text : String) instance.console.log(text);
@@ -112,6 +219,9 @@ class Game extends core.Window {
 	//private var wallsLayer : h2d.Object;
 	// private var foodLayer : h2d.Object;
 	// private var uiLayer : h2d.Object;
+	private var gameIsOver : Bool = false;
+
+	public var stats : structures.GameStats;
 
 	// trackers and variables
 	/*** how many foods should exist. */
@@ -137,18 +247,8 @@ class Game extends core.Window {
 	override function init() {
 		super.init();
 
-		// sets the default options
-		options = {
-			wallLength: 3,
-			colors: 2,
-			startingTickSpeed: 0.25,
-			tickMakeWall: 1.15,
-			tickEatFood: 0.95,
-			foodLimit: 3,
-			tickMovement: 0.9999,
-			foodGenBaseCut: 0.25,
-			foodGenPlayerCut: 0.75,
-		};
+		// loads data
+		game.Game.load();
 
 		clock = new Clock(options.startingTickSpeed);
 
@@ -197,6 +297,10 @@ class Game extends core.Window {
 	 * do some kind of cleanup logic here
 	 */
 	public function quit() {
+
+		// saves things
+		game.Game.save();
+
 		hxd.System.exit();
 	}
 
@@ -204,7 +308,16 @@ class Game extends core.Window {
 	 * configures the game for a new play session (a new game)
 	 */
 	private function start() {
+
+		// saves stuff
+		game.Game.save();
+
 		clock.reset();
+		gameIsOver = false;
+
+		stats = {
+			score: 0,
+		}
 
 		///////////////////////////////////////////
 		// PLAYER STUFFS
@@ -240,7 +353,16 @@ class Game extends core.Window {
 	}
 
 	private function gameOver() {
-		start();
+		pause = true;
+		gameIsOver = true;
+
+		// need to see if we got a high score or not.
+		if (isNewHighScore(stats.score, options.colors)) setMenu(menus.EnterScore.enterScore(viewportWidth, viewportHeight));
+		else setMenu(menus.HighScores.highScores(viewportWidth, viewportHeight));
+
+		// remove the score indication on the topbar because it goes to '2'??
+		ui.hideScore();
+
 	}
 
 	private function tick() {
@@ -267,6 +389,10 @@ class Game extends core.Window {
 		// checks for game over collisions
 		if (player.collides(tails)) gameOver();
 		if (player.collides(walls.iter(), checkCollisionsIfEatableWall)) gameOver();
+
+		if (gameIsOver) {
+			player.setGridPosition(grid.getScreenPosition(lastx, lasty));
+		}
 
 		////////////////////////////////////////////
 		// UPDATES TAIL POSITIONS
@@ -396,7 +522,8 @@ class Game extends core.Window {
 		clock.length *= options.tickEatFood;
 
 		// updates the score.
-		ui.updateScore(ui.getFood(f.variant).value * f.value);
+		stats.score += ui.getFood(f.variant).value * f.value;
+		ui.updateScore(stats.score);
 	}
 
 	private function eatSteroid(s : obj.Steroid) {
@@ -461,6 +588,11 @@ class Game extends core.Window {
 			var window = hxd.Window.getInstance();
 			if (window.displayMode == Borderless) window.displayMode = Windowed;
 			else window.displayMode = Borderless;
+		}
+
+		// gets to the end game screen so we can test it.
+		if (e.kind == EKeyDown && e.keyCode == hxd.Key.Q) {
+			gameOver();
 		}
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#end

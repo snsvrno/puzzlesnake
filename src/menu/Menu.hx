@@ -11,6 +11,11 @@ class Menu extends h2d.Object {
     private var width : Int;
     private var height : Int;
 
+    /**
+     * if this menu can change the selected item by using the up and down commands.
+     */
+    public var verticalScroll : Bool = true;
+
     public function new(width : Int, height : Int, ?title : String, ?parent : h2d.Object) {
         super(parent);
 
@@ -75,26 +80,42 @@ class Menu extends h2d.Object {
         item.onOverCallback = onOverCallback;
     }
 
-    public function selectItem(?pos : Int = 0) {
+    /**
+     * will attempt to select the item at the position. it will return if the item
+     * was selected or not (if the item is selectable)
+     * @param pos 
+     * @return Bool
+     */
+    public function selectItem(?pos : Int = 0) : Bool {
         // makes sure we don't give it a number that is
         // out of the bounds.
         if (pos < 0 || pos > items.length) pos = 0;
 
-        items[pos].setSelected();
+        var selectable = items[pos].setSelected();
 
         // makes sure that all the other items are deselected.
         for (i in 0 ... items.length) if (i != pos) items[i].setUnSelected();
 
         selectedItem = pos;
+
+        return selectable;
     }
 
     public function keypressed(keycode : Int) {
 
         if (Controls.is("confirm", keycode)) activateItem();
         if (Controls.is("cancel", keycode)) game.Game.shiftMenu();
-		if (Controls.is("up", keycode)) previousItem();
-		if (Controls.is("down", keycode)) nextItem();
 
+        // SCROLLING
+        // if vertical scroll is enabled then we will scroll betwen items, otherwise
+        // we will pass that through to the selected item.
+		if (verticalScroll && Controls.is("up", keycode)) previousItem();
+        else if (Controls.is("up", keycode)) items[selectedItem].verticalScroll(-1);
+        // 
+		if (verticalScroll && Controls.is("down", keycode)) nextItem();
+        else if (Controls.is("down", keycode)) items[selectedItem].verticalScroll(1);
+
+        // selecting the choice, is always passed through to the selected item.
 		if (Controls.is("left", keycode)) items[selectedItem].moveChoice(-1);
 		if (Controls.is("right", keycode)) items[selectedItem].moveChoice(1);
         
@@ -105,7 +126,7 @@ class Menu extends h2d.Object {
 
         if (selectedItem < 0) selectedItem = items.length-1;
 
-        selectItem(selectedItem);
+        if (selectItem(selectedItem) == false) previousItem();
     }
 
     private function nextItem() {
@@ -113,7 +134,7 @@ class Menu extends h2d.Object {
 
         if (selectedItem > items.length - 1) selectedItem = 0;
 
-        selectItem(selectedItem);
+        if (selectItem(selectedItem) == false) nextItem();
     }
 
     private function activateItem() {

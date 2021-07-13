@@ -29,12 +29,14 @@ class ChoiceItem extends Item {
         interactive.height = flex.innerHeight;
     }
 
-    override function setSelected() {
+    override function setSelected() : Bool {
         super.setSelected();
         for (i in 0 ... choices.length) {
             if (i == selected) choices[i].setSelected();
             else choices[i].setUnSelected();
         }
+
+        return true;
     }
 
     override function setUnSelected() {
