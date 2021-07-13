@@ -50,6 +50,22 @@ class LetterEntry extends Item {
         return text;
     }
 
+    /**
+     * sets the text of the letter entry
+     * 
+     * if the supplied text is larger than the letterEntry object then it will be 
+     * cut off, if the supplied text is smaller then it will be padded with spaces.
+     * @param text 
+     * @return String
+     */
+    public function setText(text : String) : String {
+        for (i in 0 ... letters.length) {
+            if (i < text.length) letters[i].text = text.charAt(i);
+            else letters[i].text = "";
+        }
+        return text;
+    }
+
     override function verticalScroll(direction:Int) {
         if (direction < 0) letters[selectedCharacter].scrollUp();
         else if (direction > 0) letters[selectedCharacter].scrollDown();

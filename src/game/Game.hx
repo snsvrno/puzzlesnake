@@ -6,6 +6,7 @@ class Game extends core.Window {
 	// STATIC STUFF
 
 	static public var highScores : Array<Array<{name : String, score : Int}>> = [];
+	static public var lastUsedHighScoreName : String = "AAA";
 
 	static public var instance : Game;
 
