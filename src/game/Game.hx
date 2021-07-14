@@ -241,6 +241,8 @@ class Game extends core.Window {
 	// doing this route so I can manage draw order and easily show / hide
 	// different types of stuff.
 	private var playerLayer : h2d.Object;
+	private var effectsLayer : h2d.Object;
+	private var effectsPoints : Array<obj.Point> = [];
 	//private var wallsLayer : h2d.Object;
 	// private var foodLayer : h2d.Object;
 	// private var uiLayer : h2d.Object;
@@ -283,6 +285,7 @@ class Game extends core.Window {
 		// wallsLayer = new h2d.Object(world);
 		playerLayer = new h2d.Object(world);
 		grid = new game.Grid(settings.Game.GRID_WIDTH, settings.Game.GRID_HEIGHT, world);
+		effectsLayer = new h2d.Object(world);
 
 		var uiheight = 20;
 
@@ -455,13 +458,20 @@ class Game extends core.Window {
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				#end
 
+				var ax : Float = 0;
+				var ay : Float = 0;
+				
 				// we need to remove the tail segments, convert them
 				// to walls and keep them in place.
 				for (_ in 0 ... settings.Game.WALL_BUILD_LENGTH) {
 					var segment = tails.pop();
 
 					var wall = new obj.Wall(segment.variant);
-					wall.setGridPosition(segment.getGridPosition());
+					var segmentPosition = segment.getGridPosition();
+					wall.setGridPosition(segmentPosition);
+
+					ax += segmentPosition.cx;
+					ay += segmentPosition.cy;
 
 					playerLayer.removeChild(segment);
 					walls.addObj(wall);
@@ -473,6 +483,13 @@ class Game extends core.Window {
 
 				// adjust the multiplier.
 				ui.getFood(tail.variant).increase();
+
+				// creates the score notification display
+				ax /= settings.Game.WALL_BUILD_LENGTH;
+				ay /= settings.Game.WALL_BUILD_LENGTH;
+				var point = new obj.Point('x${ui.getFood(tail.variant).value}', ax, ay);
+				effectsPoints.push(point);
+				effectsLayer.addChild(point);
 				
 				// reset the time by some amount
 				clock.length *= options.tickMakeWall;
@@ -546,8 +563,15 @@ class Game extends core.Window {
 		clock.length *= options.tickEatFood;
 
 		// updates the score.
-		stats.score += ui.getFood(f.variant).value * f.value;
-		ui.updateScore(stats.score);
+		var scoreAmount = ui.getFood(f.variant).value * f.value;
+		stats.score += scoreAmount;
+		ui.setScore(stats.score);
+
+		// creates the score notification display
+		var fp = f.getGridPosition();
+		var point = new obj.Point('+$scoreAmount', fp.cx, fp.cy);
+		effectsPoints.push(point);
+		effectsLayer.addChild(point);
 	}
 
 	private function eatSteroid(s : obj.Steroid) {
@@ -576,7 +600,15 @@ class Game extends core.Window {
 		walls.removeObj(w);
 		
 		// updates the score.
-		ui.updateScore(ui.getFood(w.variant).value * w.value);
+		var scoreAmount = ui.getFood(w.variant).value * w.value;
+		stats.score += scoreAmount;
+		ui.setScore(stats.score);
+
+		// creates the score notification display
+		var fp = w.getGridPosition();
+		var point = new obj.Point('+$scoreAmount', fp.cx, fp.cy);
+		effectsPoints.push(point);
+		effectsLayer.addChild(point);
 	}
 
 	override function update(dt:Float) {
@@ -587,6 +619,10 @@ class Game extends core.Window {
 		if (clock.update(dt)) tick();
 
 		obj.GridObject.runAppUpdates(dt);
+
+		///////////////////////////////////
+		// updates the effects.
+		for (p in effectsPoints) if (p.update(dt)) effectsPoints.remove(p);
 	}
 
 	override function onEvent(e : hxd.Event) {

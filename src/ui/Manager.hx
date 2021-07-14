@@ -70,7 +70,14 @@ class Manager extends h2d.Object {
         return null;
     }   
 
-    public function updateScore(newValue : Int) {
+    public function addToScore(adder : Int) {
+        if (score != null) {
+            score.value += adder;
+            score.visible = true;
+        }
+    }
+
+    public function setScore(newValue : Int) {
         if (score != null) { 
             score.value = newValue;
             score.visible = true;
