@@ -43,9 +43,14 @@ class Tile extends h2d.Graphics {
 		}
 	}
 
-	public function clearBlocking() {
+	public function clearBlocking(?direction : Player.Direction) {
 		var cleared : Bool = false;
-		for (d in blockings.keys()) if (blockings.remove(d) && !cleared) cleared = true;
+
+		if (direction != null) cleared = blockings.remove(direction);
+		else {
+			for (d in blockings.keys()) if (blockings.remove(d) && !cleared) cleared = true;
+		}
+		
 		if (cleared) updateGraphics();
 	}
 

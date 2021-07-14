@@ -601,7 +601,10 @@ class Game extends core.Window {
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		#end
 
+		// cleans up after the wall.
 		walls.removeObj(w);
+		// needs to remove any edge markes if we have those defined.
+		removeEdgeGrid(w);
 		
 		// updates the score.
 		var scoreAmount = ui.getFood(w.variant).value * w.value;
@@ -833,6 +836,16 @@ class Game extends core.Window {
 				if (w.gy == 0) grid.getTile(w.gx, grid.height - 1).setBlocking(Down, w.variant);
 				else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).setBlocking(Up, w.variant);
 			}
+		}
+	}
+
+	private function removeEdgeGrid(w : obj.Wall) {
+		if (grid.isEdge(w.gx, w.gy)) {
+			if (w.gx == 0) grid.getTile(grid.width - 1, w.gy).clearBlocking(Right);
+			else if (w.gx == grid.width-1) grid.getTile(0, w.gy).clearBlocking(Left);
+
+			if (w.gy == 0) grid.getTile(w.gx, grid.height - 1).clearBlocking(Down);
+			else if (w.gy == grid.height - 1) grid.getTile(w.gx, 0).clearBlocking(Up);
 		}
 	}
 
