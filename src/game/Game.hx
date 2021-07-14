@@ -497,10 +497,6 @@ class Game extends core.Window {
 
 			// update your color to the tail color
 			if (tails.length > 0) player.setHeadColor(tails[tails.length-1].variant);
-
-			// since we ate a food we should check if we need to populate more 
-			// food
-			makeFood();
 		}
 
 		/////////////////////////////////////////
@@ -534,6 +530,9 @@ class Game extends core.Window {
 			steroidGenTracker = 0;
 			makeSteroid();
 		} 
+
+		// checks if we need to make a food.
+		makeFood();
 	}
 
 	/**
@@ -586,6 +585,11 @@ class Game extends core.Window {
 		for (w in walls.iter()) {
 			if (w.variant == s.variant) w.setEatable();
 		}
+
+		foods.removeObj(s);
+
+		// increments the speed! if we eat something.
+		clock.length *= options.tickEatFood;
 	}
 
 	private function eatWall(w : obj.Wall) {
@@ -688,8 +692,8 @@ class Game extends core.Window {
 	/**
 	 * makes food for the player to eat.
 	 */
-	private function makeFood() {
-		while (foods.length < options.foodLimit) {
+	private function makeFood(force : Bool = false) {
+		while (force || foods.length < options.foodLimit) {
 			var position = grid.getRandomPosition([[player], cast(foods.iter(), Array<Dynamic>), tails, walls.iter()]);
 
 			var f = new obj.Food(options.colors);
