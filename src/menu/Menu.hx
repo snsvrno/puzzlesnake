@@ -30,6 +30,15 @@ class Menu extends h2d.Object {
         flex.verticalAlign = Middle;
         flex.horizontalAlign = Middle;
 
+        var cornerText = new h2d.Text(hxd.res.DefaultFont.get(), this);
+        cornerText.text = game.Game.version;
+        #if debug
+        cornerText.text += ' (${game.Game.buildInformation})';
+        #end
+        cornerText.textAlign = Right;
+        cornerText.x = width - 10;
+        cornerText.y = height - 10;
+
         if (title != null) {
             var titleObject = new h2d.Text(hxd.res.DefaultFont.get(), flex);
             titleObject.color = h3d.Vector.fromColor(Settings.ui1Color);

@@ -7,6 +7,9 @@ class Game extends core.Window {
 	////////////////////////////////////////////////////////////////////
 	// STATIC STUFF
 
+	static public final version : String = core.Macros.getVersionTag();
+	static public final buildInformation : String = core.Macros.getGitCommitHash(7) + "|" + core.Macros.getDate();
+
 	static public var highScores : Array<Array<{name : String, score : Int}>> = [];
 	static public var lastUsedHighScoreName : String = "AAA";
 
