@@ -1,5 +1,7 @@
 package game;
 
+import format.zip.Data.Entry;
+
 class Game extends core.Window {
 
 	////////////////////////////////////////////////////////////////////
@@ -248,7 +250,9 @@ class Game extends core.Window {
 	// private var uiLayer : h2d.Object;
 	private var gameIsOver : Bool = false;
 
-	public var stats : structures.GameStats;
+	/*** increases when continously eating walls */
+	// to incentivize making long strange walls.
+	private var wallEatingComboCounter : Int = 0;
 
 	// trackers and variables
 	/*** how many foods should exist. */
@@ -261,6 +265,8 @@ class Game extends core.Window {
 	public var options : structures.GameplayOptions;
 	public var pause : Bool = false;
 
+	public var stats : structures.GameStats;
+	
 	////////////////////////////////////////////////////////////////////
 
 	public function new() {
@@ -399,6 +405,9 @@ class Game extends core.Window {
 		// tells all the objects that a tick has passed
 		obj.GridObject.runAllTicks();
 
+		// internal tracking items
+		var ateAWall : Bool = false;
+
 		/////////////////////////////////////////
 		// PLAYER MOVEMENT THINGS
 		// first we track the current player position for the tails
@@ -517,6 +526,8 @@ class Game extends core.Window {
 		for (w in walls.iter()) {
 			if (w.gx == player.gx && w.gy == player.gy) {
 				eatWall(w);
+
+				ateAWall = true;
 				
 				// we update the steroid tracker, because we create a steroid
 				// ever XX foods.
@@ -533,6 +544,10 @@ class Game extends core.Window {
 
 		// checks if we need to make a food.
 		makeFood();
+
+		// manages the wall eating combo
+		if (ateAWall) wallEatingComboCounter += 1;
+		else if (ateAWall == false && wallEatingComboCounter > 0) wallEatingComboCounter = 0;
 	}
 
 	/**
@@ -607,7 +622,7 @@ class Game extends core.Window {
 		removeEdgeGrid(w);
 		
 		// updates the score.
-		var scoreAmount = ui.getFood(w.variant).value * w.value;
+		var scoreAmount = (ui.getFood(w.variant).value + wallEatingComboCounter) * w.value;
 		stats.score += scoreAmount;
 		ui.setScore(stats.score);
 
@@ -616,6 +631,9 @@ class Game extends core.Window {
 		var point = new obj.Point('+$scoreAmount', fp.cx, fp.cy);
 		effectsPoints.push(point);
 		effectsLayer.addChild(point);
+
+		// goes through and adds a tick to each of the walls
+		for (w in walls.iter()) w.pauseCountdown();
 	}
 
 	override function update(dt:Float) {

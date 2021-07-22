@@ -12,6 +12,8 @@ class Wall extends GridObject {
     private var sinX : Int = 0;
     private var blinkFrame : Bool = false;
 
+    private var pauseCountdownBit : Bool = false;
+
 	public function new(variant : Int, ?parent : h2d.Object) {
 		super(parent);
 
@@ -33,6 +35,12 @@ class Wall extends GridObject {
 
 		updateGraphics();
     }
+
+    /**
+     * adds an pauses this tick's update of the countdown, will not
+     * do anything if the wall is not eatable.
+     */
+    public function pauseCountdown() if (eatable) pauseCountdownBit = true;
 
     override function forceRedraw() {
         // updates the colors
@@ -60,7 +68,8 @@ class Wall extends GridObject {
     override function turnTick() {
         if (eatable) {
 
-            countdown -= 1;
+            if (pauseCountdownBit == false) countdown -= 1;
+            pauseCountdownBit = false;
             
             if (countdown <= 0) {
                 eatable = false;
