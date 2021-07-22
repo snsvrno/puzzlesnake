@@ -162,6 +162,7 @@ class Game extends core.Window {
 	static public function load(updateUi : Bool = true) {
 
 		var loadedData = hxd.Save.load();
+		if (loadedData == null) loadedData = { };
 
 		if (Reflect.hasField(loadedData, "score")) highScores = Reflect.getProperty(loadedData,"score");
 		else highScores = [];
@@ -259,7 +260,7 @@ class Game extends core.Window {
 	private var tailQueue : Array<obj.Food> = [];
 	private var player : obj.Player;
 	/*** tracks when we should make a new steroid */
-	private var steroidGenTracker : Int;
+	private var steroidGenTracker : Int = 0;
 
 	/*** all the specific gamplay options */
 	public var options : structures.GameplayOptions;

@@ -39,10 +39,14 @@ function main(width : Int, height : Int) : menu.Menu {
     menu.addItem(highScores);
 
     
-
+    #if !js
+    // js candidate will not have an exit option since it is in the browser.
+    
     var exit = new menu.components.Choice("Quit");
     exit.onPress = () -> game.Game.instance.quit();
     menu.addItem(exit);
+
+    #end
 
     // selects the first item.
     menu.selectItem();

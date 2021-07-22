@@ -33,6 +33,8 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     bloomShader.onToggle = (state : Bool) -> game.Game.instance.toggleBloomShader(state);
     menu.addItem(bloomShader);
 
+    #if !js
+    // the javascript release will not have a fullscreen option.
     var fullScreen = {
         var window = hxd.Window.getInstance();
         new menu.components.Toggle("Fullscreen", window.displayMode == Borderless);
@@ -46,6 +48,7 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
     };
     menu.addItem(fullScreen);
 
+    #end
 
     ////////////////////////////////
     // the 'ok' or 'cancel' selection 
@@ -59,7 +62,9 @@ function visualOptions(width : Int, height : Int) : menu.Menu {
         // we should revert everything back to the original options
         bubbleShader.reset();
         crtShader.reset();
+        #if !js
         fullScreen.reset();
+        #end
         paletteChoice.reset();
         // go back
         game.Game.shiftMenu();
