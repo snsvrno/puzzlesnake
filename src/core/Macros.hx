@@ -40,20 +40,35 @@ class Macros {
 
     public static macro function getVersionTag() : haxe.macro.Expr.ExprOf<String> {
         #if !display
-        var process = new sys.io.Process('git', ['tag', '--sort=taggerdate']);
+        var process = new sys.io.Process('git', ['tag', '--sort=committerdate']);
         if (process.exitCode() != 0) {
           var message = process.stderr.readAll().toString();
           var pos = haxe.macro.Context.currentPos();
-          haxe.macro.Context.error("Cannot execute `git tag --sort=taggerdate`. " + message, pos);
+          haxe.macro.Context.error("Cannot execute `git tag --sort=committerdate`. " + message, pos);
         }
+
+        // latest tag
+
+        var latesttag = {
+            var process = new sys.io.Process('git', ['describe', '--tags']);
+            if (process.exitCode() != 0) {
+              var message = process.stderr.readAll().toString();
+              var pos = haxe.macro.Context.currentPos();
+              haxe.macro.Context.error("Cannot execute `git describe --tags`. " + message, pos);
+            }
+            process.stdout.readLine();
+        };
         
         // read the output of the process
-        var version:String = " ";
+        var version:String = "";
         try {
-            while(version.length > 0 && version.substr(0,1) != 'v') version = process.stdout.readLine();
-            if (version.length > 0) version = version.substr(1);
-        } catch (e) { 
-            version = "_._._"; 
+            var tempver:String= "";
+            while(tempver != latesttag) {
+                tempver = process.stdout.readLine();
+                if (tempver.substr(0,1) == 'v') version = tempver.substr(1);
+            }
+        } catch (e) {
+            if (version == "") version = "_._._"; 
         }
 
         // Generates a string expression
